@@ -32,7 +32,6 @@ public static class CommandManager
             Print("update SW-<id>,<name>,<isTurnedOn>,<battery%>");
             Print("update P-<id>,<name>,<isTurnedOn>,<OS?>");
             Print("update ED-<id>,<name>,<ip>,<networkName>");
-
         }
     }
 
@@ -41,9 +40,28 @@ public static class CommandManager
         Print("unexpected input");
     }
 
-    public static void HandleAddDevice()
+    public static void HandleAddDevice(string[] command)
     {
-        Print("add");
+        try
+        {
+            var line = "";
+            foreach (var cmd in command.Skip(1).ToArray())
+            {
+                line += cmd;
+            }
+
+            var device = DeviceManager.GetDeviceByString(line);
+            var deviceType = DeviceManager.GetDeviceType(device);
+            DeviceManager.GetInstance("input.txt").AddDevice(deviceType, line);
+            Print("device successfully added");
+        }
+        catch (Exception)
+        {
+            Print("Correct use:");
+            Print("add SW-<id>,<name>,<isTurnedOn>,<battery%>");
+            Print("add P-<id>,<name>,<isTurnedOn>,<OS?>");
+            Print("add ED-<id>,<name>,<ip>,<networkName>");
+        }
     }
 
     public static void HandleDeleteDevice(string[] command)

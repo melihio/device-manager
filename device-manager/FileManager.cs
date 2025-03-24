@@ -2,6 +2,11 @@ namespace device_manager;
 
 public static class FileManager
 {
+    public static void AddLine(string filePath, string line)
+    {
+        File.AppendAllText(filePath,"\n"+line);
+    }
+    
     public static void DeleteLine(string filePath, string deviceType, string deviceId)
     {
         var lines = File.ReadAllLines(filePath).ToList();

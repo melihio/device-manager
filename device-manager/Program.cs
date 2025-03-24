@@ -22,7 +22,7 @@ while (true)
             CommandManager.HandleGetAllDevices();
             break;
         case "add":
-            CommandManager.HandleAddDevice();
+            CommandManager.HandleAddDevice(command);
             break;
         case "delete":
             CommandManager.HandleDeleteDevice(command);
