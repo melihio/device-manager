@@ -2,6 +2,23 @@ namespace device_manager;
 
 public static class FileManager
 {
+    public static void DeleteLine(string filePath, string deviceType, string deviceId)
+    {
+        var lines = File.ReadAllLines(filePath).ToList();
+        
+        for (var i = 0; i < lines.Count; i++)
+        {
+            var values = lines[i].Split(',');
+            var deviceInfo = values[0].Split('-');
+
+            if (deviceInfo[0] == deviceType && deviceInfo[1] == deviceId)
+            {
+               lines.RemoveAt(i);
+            } 
+        };
+        
+        File.WriteAllLines(filePath, lines);
+    }
     public static void UpdateLine(string filePath, string deviceType, Device updatedDevice)
     {
         var lines = File.ReadAllLines(filePath).ToList();

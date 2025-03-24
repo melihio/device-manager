@@ -25,7 +25,7 @@ while (true)
             CommandManager.HandleAddDevice();
             break;
         case "delete":
-            CommandManager.HandleDeleteDevice();
+            CommandManager.HandleDeleteDevice(command);
             break;
         case "update":
             CommandManager.HandleUpdateDevice(command);

@@ -29,9 +29,9 @@ public static class CommandManager
         catch (Exception)
         {
             Print("Correct use:");
-            Print("SW-<id>,<name>,<isTurnedOn>,<battery%>");
-            Print("P-<id>,<name>,<isTurnedOn>,<OS?>");
-            Print("ED-<id>,<name>,<ip>,<networkName>");
+            Print("update SW-<id>,<name>,<isTurnedOn>,<battery%>");
+            Print("update P-<id>,<name>,<isTurnedOn>,<OS?>");
+            Print("update ED-<id>,<name>,<ip>,<networkName>");
 
         }
     }
@@ -46,9 +46,12 @@ public static class CommandManager
         Print("add");
     }
 
-    public static void HandleDeleteDevice()
+    public static void HandleDeleteDevice(string[] command)
     {
-        Print("delete");
+        var deviceType = command[1].Split("-")[0];
+        var deviceId = command[1].Split("-")[1];
+        DeviceManager.GetInstance("input.txt").DeleteDevice(deviceType, deviceId);
+        Print("device successfully deleted");
     }
 
     public static void HandleDeviceTurnOn(string[] command)

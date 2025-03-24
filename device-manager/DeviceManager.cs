@@ -33,6 +33,12 @@ public class DeviceManager
         ReadDevicesFromFile();
     }
 
+    public void DeleteDevice(string deviceType, string deviceId)
+    {
+        FileManager.DeleteLine(_filePath, deviceType , deviceId);
+        ReadDevicesFromFile();
+    }
+
     public Device GetDeviceById(string deviceType, string deviceId)
     {
         switch (deviceType)
