@@ -46,32 +46,15 @@ public class DeviceManager
         }
 
         string deviceId = deviceInfo[1];
-
-        // Check if the device ID already exists
+        
         if (lines.Any(line => line.StartsWith($"{deviceType}-{deviceId},")))
         {
             Console.WriteLine("Error: Device with the same ID already exists.");
             return;
         }
-
-        // Validate and create the new device line
-        string newLine = deviceType switch
-        {
-            "SW" when values.Length == 4 && bool.TryParse(values[2], out bool turnedOn) && int.TryParse(values[3].Replace("%", ""), out int battery)
-                => $"{deviceType}-{deviceId},{values[1]},{turnedOn},{battery}%",
         
-            "P" when values.Length >= 3 && bool.TryParse(values[2], out bool pcTurnedOn)
-                => $"{deviceType}-{deviceId},{values[1]},{pcTurnedOn},{(values.Length == 4 ? values[3] : "")}",
         
-            "ED" when values.Length == 4
-                => $"{deviceType}-{deviceId},{values[1]},{values[2]},{values[3]}",
-
-            _ => throw new ArgumentException("Invalid device format.")
-        };
-
-        // Use FileManager.AddLine() instead of manually writing to file
-        FileManager.AddLine(_filePath, newLine);
-        Console.WriteLine($"Successfully added device: {newLine}");
+        FileManager.AddLine(_filePath, deviceData);
     }
 
 

@@ -7,3 +7,5 @@ ED-3,Pi4,whatisIP,MyWifiName
 Capital33,BestPC_Ever,null,456217865891789
 16//16//16//16
 SW-3,test,False,15%
+SW-4,test,false,24%
+SW-5,test,false,12%
