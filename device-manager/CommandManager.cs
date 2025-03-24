@@ -6,6 +6,17 @@ public static class CommandManager
     {
         Print("available commands: help, add, delete");
     }
+
+    public static void HandleAddData(string[] command)
+    {
+        var line = "";
+        foreach (var cmd in command.Skip(1).ToArray())
+        {
+            line += " " + cmd;
+        }
+        FileManager.AddLine("input.txt",line);
+    }
+    
     public static void HandleGetAllDevices()
     {
         DeviceManager.GetInstance("input.txt").GetAllDevices().ForEach(Console.WriteLine);
@@ -28,7 +39,7 @@ public static class CommandManager
         }
         catch (Exception)
         {
-            Print("Correct use:");
+            Print("usage:");
             Print("update SW-<id>,<name>,<isTurnedOn>,<battery%>");
             Print("update P-<id>,<name>,<isTurnedOn>,<OS?>");
             Print("update ED-<id>,<name>,<ip>,<networkName>");
@@ -57,10 +68,10 @@ public static class CommandManager
         }
         catch (Exception)
         {
-            Print("Correct use:");
-            Print("add SW-<id>,<name>,<isTurnedOn>,<battery%>");
-            Print("add P-<id>,<name>,<isTurnedOn>,<OS?>");
-            Print("add ED-<id>,<name>,<ip>,<networkName>");
+            Print("usage:");
+            Print("add-device SW-<id>,<name>,<isTurnedOn>,<battery%>");
+            Print("add-device P-<id>,<name>,<isTurnedOn>,<OS?>");
+            Print("add-device ED-<id>,<name>,<ip>,<networkName>");
         }
     }
 

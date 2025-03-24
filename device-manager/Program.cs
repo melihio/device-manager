@@ -18,10 +18,13 @@ while (true)
         case "help":
             CommandManager.HandleHelp();       
             break;
+        case "add-data":
+            CommandManager.HandleAddData(command);
+            break;
         case "view":
             CommandManager.HandleGetAllDevices();
             break;
-        case "add":
+        case "add-device":
             CommandManager.HandleAddDevice(command);
             break;
         case "delete":
