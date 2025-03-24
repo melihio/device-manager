@@ -19,8 +19,14 @@ public class PersonalComputer: Device
         this.name = name;
     }
 
-    public void Launch()
+    public override void TurnOn()
     {
         if (operatingSystem == null) throw new EmptySystemException();
+        TurnedOn = true;
+    }
+    
+    public override string ToString()
+    {
+        return $"Personal computer - Name: {name} Id: {id} OperatingSystem: {operatingSystem} Status: {TurnedOn}";
     }
 }

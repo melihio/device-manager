@@ -38,13 +38,16 @@ public class DeviceManager
                     devices.Add(ed);
                     break;
                 case "SW":
+                    turnedOn = bool.Parse(values[2]);
+                    var battery = int.Parse(values[3].Replace("%",""));
+                    var sw = new Smartwatch(battery, turnedOn,deviceType[1],values[1]);
                     break;
             }
         }
 
         foreach (var device in devices)
         {
-            Console.WriteLine(device.name + "-" + device.id);   
+            Console.WriteLine(device.ToString());   
         }
     }
 }
