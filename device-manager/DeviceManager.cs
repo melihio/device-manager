@@ -10,6 +10,7 @@ public class DeviceManager
         }
         _filePath = filePath;
         _devices = [];
+        ReadDevicesFromFile();
     }
 
     private static DeviceManager? _deviceManager;
@@ -23,8 +24,22 @@ public class DeviceManager
 
     public List<Device> GetAllDevices()
     {
-        ReadDevicesFromFile();
         return _devices;
+    }
+
+    public Device GetDevice(string deviceType, string deviceId)
+    {
+        switch (deviceType)
+        {
+            case "SW":
+                return _devices.OfType<Smartwatch>().First(d => d.id == deviceId);
+            case "PC":
+                return _devices.OfType<PersonalComputer>().First(d => d.id == deviceId);
+            case "ED":
+                return _devices.OfType<EmbeddedDevice>().First(d => d.id == deviceId);
+            default:
+                throw new ArgumentException("Invalid device type");
+        }
     }
 
     public void ReadDevicesFromFile()

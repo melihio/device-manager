@@ -10,4 +10,15 @@ public static class CommandManager
     {
         DeviceManager.GetInstance("input.txt").GetAllDevices().ForEach(Console.WriteLine);
     }
+
+    public static void HandleDeviceTurnOn(string deviceType, string deviceId)
+    {
+        DeviceManager.GetInstance("input.txt").GetDevice(deviceType,deviceId).TurnOn();
+        Console.WriteLine("Device successfully turned on");
+    }
+    public static void HandleDeviceTurnOff(string deviceType, string deviceId)
+    {
+        DeviceManager.GetInstance("input.txt").GetDevice(deviceType,deviceId).TurnOff();
+        Console.WriteLine("Device successfully turned off");
+    }
 }

@@ -27,6 +27,10 @@ while (true)
             Console.WriteLine(">delete");
             break;
         case "turn-on":
+            CommandManager.HandleDeviceTurnOn(command[1], command[2]);
+            break;
+        case "turn-off":
+            CommandManager.HandleDeviceTurnOff(command[1], command[2]);
             break;
         default: 
             Console.WriteLine(">unexpected input");
