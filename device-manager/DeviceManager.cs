@@ -34,25 +34,16 @@ public class DeviceManager
 
         if (values.Length < 3)
         {
-            Console.WriteLine("Error: Invalid device format.");
-            return;
+            throw new FormatException("Invalid device data");
         }
 
-        string[] deviceInfo = values[0].Split('-');
-        if (deviceInfo.Length != 2)
-        {
-            Console.WriteLine("Error: Invalid device ID format.");
-            return;
-        }
-
-        string deviceId = deviceInfo[1];
+        string deviceId = values[0].Split('-')[1];
+        
         
         if (lines.Any(line => line.StartsWith($"{deviceType}-{deviceId},")))
         {
-            Console.WriteLine("Error: Device with the same ID already exists.");
-            return;
+            throw new ArgumentException("Device with given ID already exists.");
         }
-        
         
         FileManager.AddLine(_filePath, deviceData);
     }
