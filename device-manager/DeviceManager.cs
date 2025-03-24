@@ -21,6 +21,11 @@ public class DeviceManager
         return _deviceManager ??= new DeviceManager(filePath);
     }
 
+    public List<Device> GetAllDevices()
+    {
+        return _devices;
+    }
+
     public void ReadDevicesFromFile()
     {
         var lines = File.ReadAllLines(_filePath);
@@ -45,11 +50,6 @@ public class DeviceManager
                     _devices.Add(sw);
                     break;
             }
-        }
-
-        foreach (var device in _devices)
-        {
-            Console.WriteLine(device.ToString());   
         }
     }
 }
