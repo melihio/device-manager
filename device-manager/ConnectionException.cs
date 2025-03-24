@@ -1,9 +1,3 @@
 namespace device_manager;
 
-public class ConnectionException: Exception
-{
-    public ConnectionException()
-        : base("Invalid network name")
-    {
-    }
-}
+public class ConnectionException() : Exception("Invalid network name");
