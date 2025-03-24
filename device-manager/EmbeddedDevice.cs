@@ -4,8 +4,8 @@ namespace device_manager;
 
 public class EmbeddedDevice: Device
 {
-    public string IpAddress { get; set; }
-    public string NetworkName {get; set;}
+    private string IpAddress { get; set; }
+    private string NetworkName {get; set;}
 
     public EmbeddedDevice(string ipAddress, string networkName, string id, string name, bool turnedOn)
     {
@@ -20,6 +20,11 @@ public class EmbeddedDevice: Device
     {
         Connect();
         TurnedOn = true;
+    }
+
+    public override void TurnOff()
+    {
+        TurnedOn = false;
     }
     
     public void Connect()

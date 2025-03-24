@@ -9,11 +9,11 @@ namespace device_manager;
 
 public class PersonalComputer: Device
 {
-    public string? operatingSystem { get; set; }
+    public string? OperatingSystem { get; set; }
 
     public PersonalComputer(string? operatingSystem, bool turnedOn, string id, string name)
     {
-        this.operatingSystem = operatingSystem;
+        this.OperatingSystem = operatingSystem;
         this.TurnedOn = turnedOn;
         this.id = id;
         this.name = name;
@@ -21,12 +21,17 @@ public class PersonalComputer: Device
 
     public override void TurnOn()
     {
-        if (operatingSystem == null) throw new EmptySystemException();
+        if (OperatingSystem == null) throw new EmptySystemException();
         TurnedOn = true;
+    }
+
+    public override void TurnOff()
+    {
+        TurnedOn = false;
     }
     
     public override string ToString()
     {
-        return $"Personal computer - Name: {name} Id: {id} OperatingSystem: {operatingSystem} Status: {TurnedOn}";
+        return $"Personal computer - Name: {name} Id: {id} OperatingSystem: {OperatingSystem} Status: {TurnedOn}";
     }
 }
