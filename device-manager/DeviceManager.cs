@@ -16,13 +16,14 @@ public class DeviceManager
     private readonly string _filePath;
     private readonly List<Device> _devices;
 
-    public static DeviceManager GetDeviceManager(string filePath)
+    public static DeviceManager GetInstance(string filePath)
     {
         return _deviceManager ??= new DeviceManager(filePath);
     }
 
     public List<Device> GetAllDevices()
     {
+        ReadDevicesFromFile();
         return _devices;
     }
 

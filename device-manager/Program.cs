@@ -1,24 +1,32 @@
 ﻿using device_manager;
 
-Console.WriteLine("you can type help to see available commands.");
+Console.WriteLine("type help to see available commands.");
 while (true)
 {
-    DeviceManager deviceManager = DeviceManager.GetDeviceManager("./input.txt");
-    var command = Console.ReadLine().Split(" ");
+    DeviceManager deviceManager = DeviceManager.GetInstance("./input.txt");
+    var command = Console.ReadLine()?.Split(" ");
+    
+    if(command == null)
+    {
+        Console.WriteLine("Please enter a command");
+        continue;
+    }
     
     switch (command[0])
     {
         case "help":
-            Console.WriteLine(">available commands: help, add, delete");       
+            CommandManager.HandleHelp();       
             break;
         case "view":
-            deviceManager.ReadDevicesFromFile();
+            CommandManager.HandleGetAllDevices();
             break;
         case "add":
             Console.WriteLine(">add");
             break;
         case "delete":
             Console.WriteLine(">delete");
+            break;
+        case "turn-on":
             break;
         default: 
             Console.WriteLine(">unexpected input");
