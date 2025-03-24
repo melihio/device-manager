@@ -33,7 +33,7 @@ public class DeviceManager
         {
             case "SW":
                 return _devices.OfType<Smartwatch>().First(d => d.id == deviceId);
-            case "PC":
+            case "P":
                 return _devices.OfType<PersonalComputer>().First(d => d.id == deviceId);
             case "ED":
                 return _devices.OfType<EmbeddedDevice>().First(d => d.id == deviceId);
