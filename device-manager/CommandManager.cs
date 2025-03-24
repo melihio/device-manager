@@ -51,18 +51,18 @@ public static class CommandManager
         Print("delete");
     }
 
-    public static void HandleDeviceTurnOn(string deviceType, string deviceId)
+    public static void HandleDeviceTurnOn(string[] command)
     {
-        DeviceManager.GetInstance("input.txt").GetDeviceById(deviceType,deviceId).TurnOn();
+        DeviceManager.GetInstance("input.txt").GetDeviceById(command[1],command[2]).TurnOn();
         Print("Device successfully turned on");
     }
-    public static void HandleDeviceTurnOff(string deviceType, string deviceId)
+    public static void HandleDeviceTurnOff(string[] command)
     {
-        DeviceManager.GetInstance("input.txt").GetDeviceById(deviceType,deviceId).TurnOff();
+        DeviceManager.GetInstance("input.txt").GetDeviceById(command[1],command[2]).TurnOff();
         Print("Device successfully turned off");
     }
 
-    private static void Print(string input)
+    public static void Print(string? input)
     {
         Console.WriteLine("$ "+input);
     }

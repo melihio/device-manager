@@ -9,7 +9,7 @@ while (true)
     
     if(command == null)
     {
-        Console.WriteLine("Please enter a command");
+        CommandManager.Print("Please enter a command");
         continue;
     }
     
@@ -31,10 +31,10 @@ while (true)
             CommandManager.HandleUpdateDevice(command);
             break;
         case "turn-on":
-            CommandManager.HandleDeviceTurnOn(command[1], command[2]);
+            CommandManager.HandleDeviceTurnOn(command);
             break;
         case "turn-off":
-            CommandManager.HandleDeviceTurnOff(command[1], command[2]);
+            CommandManager.HandleDeviceTurnOff(command);
             break;
         default:
             CommandManager.HandleUnexpectedInput();
