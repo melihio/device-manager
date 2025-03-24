@@ -4,6 +4,7 @@ Console.WriteLine("type help to see available commands.");
 while (true)
 {
     DeviceManager deviceManager = DeviceManager.GetInstance("./input.txt");
+    Console.Write(">");
     var command = Console.ReadLine()?.Split(" ");
     
     if(command == null)
@@ -21,10 +22,13 @@ while (true)
             CommandManager.HandleGetAllDevices();
             break;
         case "add":
-            Console.WriteLine(">add");
+            CommandManager.HandleAddDevice();
             break;
         case "delete":
-            Console.WriteLine(">delete");
+            CommandManager.HandleDeleteDevice();
+            break;
+        case "update":
+            CommandManager.HandleUpdateDevice(command);
             break;
         case "turn-on":
             CommandManager.HandleDeviceTurnOn(command[1], command[2]);
@@ -32,8 +36,8 @@ while (true)
         case "turn-off":
             CommandManager.HandleDeviceTurnOff(command[1], command[2]);
             break;
-        default: 
-            Console.WriteLine(">unexpected input");
+        default:
+            CommandManager.HandleUnexpectedInput();
             break;
     }
 }

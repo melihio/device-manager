@@ -7,3 +7,4 @@
 - [x] Smartwatches
 - [x] (Embedded Device) ArgumentException, ConnectionException
 - [ ] Tests 
+- [ ] FileManager

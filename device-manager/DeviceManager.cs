@@ -27,7 +27,13 @@ public class DeviceManager
         return _devices;
     }
 
-    public Device GetDevice(string deviceType, string deviceId)
+    public void UpdateDevice(String deviceType, Device device)
+    {
+        FileManager.UpdateLine(_filePath, deviceType ,device);
+        ReadDevicesFromFile();
+    }
+
+    public Device GetDeviceById(string deviceType, string deviceId)
     {
         switch (deviceType)
         {
@@ -42,30 +48,51 @@ public class DeviceManager
         }
     }
 
-    public void ReadDevicesFromFile()
+    private void ReadDevicesFromFile()
     {
-        var lines = File.ReadAllLines(_filePath);
+        var lines = FileManager.GetAllLines(_filePath);
         foreach (var t in lines)
         {
-            var values = t.Split(',');
-            var deviceType = values[0].Split('-');
-            switch (deviceType[0])
-            {
-                case "P":
-                    var operatingSystem = values.Length == 4 ? values[3] : null;
-                    var pc = new PersonalComputer(operatingSystem,bool.Parse(values[2]),deviceType[1],values[1]);
-                    _devices.Add(pc);
-                    break;
-                case "ED":
-                    var ed = new EmbeddedDevice(values[2],values[3],deviceType[1],values[1], false);
-                    _devices.Add(ed);
-                    break;
-                case "SW":
-                    var battery = int.Parse(values[3].Replace("%",""));
-                    var sw = new Smartwatch(battery, bool.Parse(values[2]),deviceType[1],values[1]);
-                    _devices.Add(sw);
-                    break;
-            }
+            var device = GetDeviceByString(t);
+            if(device != null)
+                _devices.Add(device);
         }
     }
+
+    public static string GetDeviceType(Device device)
+    {
+        return device switch
+        {
+            Smartwatch => "SW",
+            PersonalComputer => "P",
+            EmbeddedDevice => "ED",
+            _ => throw new ArgumentException("Unknown device type")
+        };
+    }
+
+    public static Device? GetDeviceByString(string line)
+    {
+        var values = line.Split(',');
+        var deviceType = values[0].Split('-');
+
+        if (deviceType.Length < 2)
+        {
+            return null;
+        }
+
+        switch (deviceType[0])
+        {
+            case "P":
+                var operatingSystem = values.Length == 4 ? values[3] : null;
+                return new PersonalComputer(operatingSystem, bool.Parse(values[2]), deviceType[1], values[1]);
+            case "ED":
+                return new EmbeddedDevice(values[2], values[3], deviceType[1], values[1], false);
+            case "SW":
+                var battery = int.Parse(values[3].Replace("%", ""));
+                return new Smartwatch(battery, bool.Parse(values[2]), deviceType[1], values[1]);
+            default:
+                return null;
+        }
+    }
+
 }

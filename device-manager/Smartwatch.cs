@@ -7,11 +7,14 @@ interface IPowerNotifier
 
 public class Smartwatch: Device, IPowerNotifier
 {
-    private int Battery { get; set; }
+    public int Battery { get; set; }
 
     public Smartwatch(int battery,bool turnedOn,string id, string name)
     {
         this.Battery = battery;
+        this.id = id;
+        this.name = name;
+        this.TurnedOn = turnedOn;
     }
 
     public override void TurnOn()

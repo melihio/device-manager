@@ -1,5 +1,5 @@
-SW-1,Apple Watch SE2,true,27%
-P-1,LinuxPC,false,Linux Mint
+SW-1,test,False,25%
+P-1,Test,False,
 P-2,ThinkPad T440,false
 ED-1,Pi3,192.168.1.44,MD Ltd.Wifi-1
 ED-2,Pi4,192.168.1.45,eduroam
