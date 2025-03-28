@@ -1,4 +1,6 @@
-namespace device_manager;
+using device_manager.models;
+
+namespace device_manager.managers;
 
 public class DeviceManager
 {

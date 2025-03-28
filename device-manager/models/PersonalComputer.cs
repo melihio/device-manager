@@ -1,4 +1,7 @@
-namespace device_manager;
+using device_manager.exceptions;
+using device_manager.models;
+
+namespace device_manager.models;
 
 // public enum OperatingSystem
 // {

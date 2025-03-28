@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
+using device_manager.exceptions;
 
-namespace device_manager;
+namespace device_manager.models;
 
 public class EmbeddedDevice: Device
 {

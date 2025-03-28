@@ -1,4 +1,4 @@
-namespace device_manager;
+namespace device_manager.models;
 
 public class Device
 {

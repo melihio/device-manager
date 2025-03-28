@@ -1,9 +1,8 @@
-﻿using device_manager;
+﻿using device_manager.managers;
 
 Console.WriteLine("type help to see available commands.");
 while (true)
 {
-    DeviceManager deviceManager = DeviceManager.GetInstance("./input.txt");
     Console.Write(">");
     var command = Console.ReadLine()?.Split(" ");
     
@@ -15,6 +14,9 @@ while (true)
     
     switch (command[0])
     {
+        case "exit":
+            CommandManager.HandleExit();
+            break;
         case "help":
             CommandManager.HandleHelp();       
             break;

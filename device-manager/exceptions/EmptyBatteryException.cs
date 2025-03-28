@@ -1,3 +1,3 @@
-namespace device_manager;
+namespace device_manager.exceptions;
 
 public class EmptyBatteryException() : Exception("Battery is empty");

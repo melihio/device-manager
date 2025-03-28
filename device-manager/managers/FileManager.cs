@@ -1,3 +1,5 @@
+using device_manager.models;
+
 namespace device_manager;
 
 public static class FileManager

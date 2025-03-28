@@ -1,10 +1,15 @@
-namespace device_manager;
+namespace device_manager.managers;
 
 public static class CommandManager
 {
     public static void HandleHelp()
     {
-        Print("available commands: help, add, delete");
+        Print("available commands: help, exit, view, add-data, add-device, delete, update, turn-on, turn-off");
+    }
+
+    public static void HandleExit()
+    {
+        Environment.Exit(0);
     }
 
     public static void HandleAddData(string[] command)
