@@ -27,6 +27,22 @@ app.MapGet("api/devices", () =>
     }
 });
 
+
+app.MapPut("api/device/{device}", (string device) =>
+{
+    try
+    {
+        var d = DeviceManager.GetDeviceByString(device);
+        var deviceType = DeviceManager.GetDeviceType(d);
+        deviceManager.AddDevice(deviceType,device);
+        return Results.Ok("Device successfully added");
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(ex.Message);
+    }
+});
+
 app.UseHttpsRedirection();
 
 app.Run();
