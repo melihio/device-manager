@@ -24,7 +24,7 @@ public static class CommandManager
     
     public static void HandleGetAllDevices()
     {
-        DeviceManager.GetInstance("input.txt").GetAllDevices().ForEach(Console.WriteLine);
+        ManagerFactory.GetDeviceManager("input.txt").GetAllDevices().ForEach(Console.WriteLine);
     }
 
     public static void HandleClear()
@@ -43,7 +43,7 @@ public static class CommandManager
             var device = DeviceManager.GetDeviceByString(line);
 
             var deviceType = DeviceManager.GetDeviceType(device);
-            DeviceManager.GetInstance("input.txt").UpdateDevice(deviceType, device);
+            ManagerFactory.GetDeviceManager("input.txt").UpdateDevice(deviceType, device);
             Print("device successfully updated");
         }
         catch (Exception)
@@ -85,18 +85,18 @@ public static class CommandManager
     {
         var deviceType = command[1].Split("-")[0];
         var deviceId = command[1].Split("-")[1];
-        DeviceManager.GetInstance("input.txt").DeleteDevice(deviceType, deviceId);
+        ManagerFactory.GetDeviceManager("input.txt").DeleteDevice(deviceType, deviceId);
         Print("device successfully deleted");
     }
 
     public static void HandleDeviceTurnOn(string[] command)
     {
-        DeviceManager.GetInstance("input.txt").GetDeviceById(command[1],command[2]).TurnOn();
+        ManagerFactory.GetDeviceManager("input.txt").GetDeviceById(command[1],command[2]).TurnOn();
         Print("Device successfully turned on");
     }
     public static void HandleDeviceTurnOff(string[] command)
     {
-        DeviceManager.GetInstance("input.txt").GetDeviceById(command[1],command[2]).TurnOff();
+        ManagerFactory.GetDeviceManager("input.txt").GetDeviceById(command[1],command[2]).TurnOff();
         Print("Device successfully turned off");
     }
 

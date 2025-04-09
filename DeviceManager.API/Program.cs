@@ -15,7 +15,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-var deviceManager = DeviceManager.GetInstance("../../../../DeviceManager.Logic/input.txt");
+var deviceManager = ManagerFactory.GetDeviceManager("../../../../DeviceManager.Logic/input.txt");
 
 app.MapGet("api/devices", () =>
 {

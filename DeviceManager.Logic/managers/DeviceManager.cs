@@ -4,7 +4,7 @@ namespace device_manager.managers;
 
 public class DeviceManager
 {
-    private DeviceManager(string filePath)
+    public DeviceManager(string filePath)
     {
         var basePath = AppContext.BaseDirectory;
         var fullPath = Path.Combine(basePath, filePath);
@@ -13,15 +13,9 @@ public class DeviceManager
         _devices = [];
         ReadDevicesFromFile();
     }
-
-    private static DeviceManager? _deviceManager;
+    
     private readonly string _filePath;
     private readonly List<Device> _devices;
-
-    public static DeviceManager GetInstance(string filePath)
-    {
-        return _deviceManager ??= new DeviceManager(filePath);
-    }
 
     public List<Device> GetAllDevices()
     {
@@ -30,6 +24,11 @@ public class DeviceManager
 
     public void AddDevice(string deviceType, Device device)
     {
+        if (_devices.Count >= 15)
+        {
+            throw new InvalidOperationException("Maximum number of devices is 15");
+        }
+        
         foreach (var d in _devices)
         {
             if (GetDeviceType(d) == deviceType && d.id == device.id)
