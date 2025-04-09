@@ -6,11 +6,10 @@ public class DeviceManager
 {
     private DeviceManager(string filePath)
     {
-        if (!File.Exists(filePath))
-        {
-            throw new FileNotFoundException("File not found", filePath);
-        }
-        _filePath = filePath;
+        var basePath = AppContext.BaseDirectory;
+        var fullPath = Path.Combine(basePath, filePath);
+        FileManager.CheckFile(fullPath);
+        _filePath = fullPath;
         _devices = [];
         ReadDevicesFromFile();
     }
@@ -41,7 +40,6 @@ public class DeviceManager
 
         string deviceId = values[0].Split('-')[1];
         
-        
         if (lines.Any(line => line.StartsWith($"{deviceType}-{deviceId},")))
         {
             throw new ArgumentException("Device with given ID already exists.");
@@ -66,28 +64,20 @@ public class DeviceManager
 
     public Device GetDeviceById(string deviceType, string deviceId)
     {
-        switch (deviceType)
+        return deviceType switch
         {
-            case "SW":
-                return _devices.OfType<Smartwatch>().First(d => d.id == deviceId);
-            case "P":
-                return _devices.OfType<PersonalComputer>().First(d => d.id == deviceId);
-            case "ED":
-                return _devices.OfType<EmbeddedDevice>().First(d => d.id == deviceId);
-            default:
-                throw new ArgumentException("Invalid device type");
-        }
+            "SW" => _devices.OfType<Smartwatch>().First(d => d.id == deviceId),
+            "P" => _devices.OfType<PersonalComputer>().First(d => d.id == deviceId),
+            "ED" => _devices.OfType<EmbeddedDevice>().First(d => d.id == deviceId),
+            _ => throw new ArgumentException("Invalid device type")
+        };
     }
 
     private void ReadDevicesFromFile()
     {
         var lines = FileManager.GetAllLines(_filePath);
-        foreach (var t in lines)
-        {
-            var device = GetDeviceByString(t);
-            if(device != null)
-                _devices.Add(device);
-        }
+        foreach (var device in lines.Select(GetDeviceByString).OfType<Device>())
+            _devices.Add(device);
     }
 
     public static string GetDeviceType(Device device)
@@ -125,5 +115,4 @@ public class DeviceManager
                 return null;
         }
     }
-
 }

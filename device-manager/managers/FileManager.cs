@@ -1,9 +1,17 @@
 using device_manager.models;
 
-namespace device_manager;
+namespace device_manager.managers;
 
 public static class FileManager
 {
+    public static void CheckFile(string filePath)
+    {
+        if (!File.Exists(filePath))
+        {
+            throw new FileNotFoundException("File not found", filePath);
+        }
+    }
+    
     public static void AddLine(string filePath, string line)
     {
         File.AppendAllText(filePath,"\n"+line);
@@ -22,8 +30,8 @@ public static class FileManager
             {
                lines.RemoveAt(i);
             } 
-        };
-        
+        }
+
         File.WriteAllLines(filePath, lines);
     }
     public static void UpdateLine(string filePath, string deviceType, Device updatedDevice)
@@ -45,7 +53,7 @@ public static class FileManager
                     _ => throw new ArgumentException("Invalid device type")
                 };
             } 
-        };
+        }
         
         File.WriteAllLines(filePath, lines);
     }

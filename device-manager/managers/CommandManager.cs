@@ -27,27 +27,30 @@ public static class CommandManager
         DeviceManager.GetInstance("input.txt").GetAllDevices().ForEach(Console.WriteLine);
     }
 
+    public static void HandleClear()
+    {
+        Console.Clear();
+    }
+
     public static void HandleUpdateDevice(string[] command)
     {
         try
         {
             var line = "";
             foreach (var cmd in command.Skip(1).ToArray())
-            {
                 line += cmd;
-            }
 
             var device = DeviceManager.GetDeviceByString(line);
+
             var deviceType = DeviceManager.GetDeviceType(device);
             DeviceManager.GetInstance("input.txt").UpdateDevice(deviceType, device);
             Print("device successfully updated");
         }
         catch (Exception)
         {
+            Print("device not found");
             Print("usage:");
-            Print("update SW-<id>,<name>,<isTurnedOn>,<battery%>");
-            Print("update P-<id>,<name>,<isTurnedOn>,<OS?>");
-            Print("update ED-<id>,<name>,<ip>,<networkName>");
+            Print("update-device (SW/P/ED)-<id>,<name>,<isTurnedOn>,<battery%>");
         }
     }
 
@@ -74,9 +77,7 @@ public static class CommandManager
         catch (Exception)
         {
             Print("usage:");
-            Print("add-device SW-<id>,<name>,<isTurnedOn>,<battery%>");
-            Print("add-device P-<id>,<name>,<isTurnedOn>,<OS?>");
-            Print("add-device ED-<id>,<name>,<ip>,<networkName>");
+            Print("add-device (SW/P/ED)-<id>,<name>,<isTurnedOn>,<battery%>");
         }
     }
 

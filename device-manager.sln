@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "device-manager", "device-manager\device-manager.csproj", "{88C36FB4-F978-4596-9EAD-B4BE066D3DA8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HTTPApi", "HTTPApi\HTTPApi.csproj", "{6DBA9931-19FD-4217-A9D6-67FB21826EC2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{88C36FB4-F978-4596-9EAD-B4BE066D3DA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88C36FB4-F978-4596-9EAD-B4BE066D3DA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88C36FB4-F978-4596-9EAD-B4BE066D3DA8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6DBA9931-19FD-4217-A9D6-67FB21826EC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6DBA9931-19FD-4217-A9D6-67FB21826EC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6DBA9931-19FD-4217-A9D6-67FB21826EC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6DBA9931-19FD-4217-A9D6-67FB21826EC2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
