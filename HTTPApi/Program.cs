@@ -12,6 +12,21 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+var deviceManager = DeviceManager.GetInstance("../../../../device-manager/input.txt");
+
+app.MapGet("api/devices", () =>
+{
+    try
+    {
+        var devices = deviceManager.GetAllDevices();
+        return Results.Ok(devices);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(ex.Message);
+    }
+});
+
 app.UseHttpsRedirection();
 
 app.Run();
