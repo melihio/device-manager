@@ -28,29 +28,29 @@ public class DeviceManager
         return _devices;
     }
 
-    public void AddDevice(string deviceType, string deviceData)
+    public void AddDevice(string deviceType, Device device)
     {
-        var lines = File.ReadAllLines(_filePath);
-        var values = deviceData.Split(',');
-
-        if (values.Length < 3)
+        foreach (var d in _devices)
         {
-            throw new FormatException("Invalid device data");
-        }
-
-        string deviceId = values[0].Split('-')[1];
-        
-        if (lines.Any(line => line.StartsWith($"{deviceType}-{deviceId},")))
-        {
-            throw new ArgumentException("Device with given ID already exists.");
+            if (GetDeviceType(d) == deviceType && d.id == device.id)
+            {
+                throw new ArgumentException("Device with given id already exists");
+            }
         }
         
-        FileManager.AddLine(_filePath, deviceData);
+        string line = device switch
+        {
+            Smartwatch sw => $"{deviceType}-{sw.id},{sw.name},{sw.TurnedOn},{sw.Battery}%",
+            PersonalComputer pc => $"{deviceType}-{pc.id},{pc.name},{pc.TurnedOn},{pc.OperatingSystem}",
+            EmbeddedDevice ed => $"{deviceType}-{ed.id},{ed.name},{ed.IpAddress},{ed.NetworkName}",
+            _ => throw new ArgumentException("Invalid device type")
+        };
+        
+        FileManager.AddLine(_filePath, line);
+        ReadDevicesFromFile();
     }
 
-
-
-    public void UpdateDevice(String deviceType, Device device)
+    public void UpdateDevice(string deviceType, Device device)
     {
         FileManager.UpdateLine(_filePath, deviceType ,device);
         ReadDevicesFromFile();

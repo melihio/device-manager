@@ -4,10 +4,12 @@ ED-2,Pi4,192.168.1.45,eduroam
 ED-3,Pi4,whatisIP,MyWifiName
 Capital33,BestPC_Ever,null,456217865891789
 16//16//16//16
-SW-3,test,False,15%
+SW-3,testasdasddddd,False,0%
 SW-4,test,false,24%
 SW-5,test,false,12%
 SW-6,test,false,25%
 SW-7,test,False,26%
-
 SW-1,test,false,25%
+SW-10,testasdasddddd,False,0%
+SW-11,testasdasddddd,False,0%
+SW-12,testasdasddddd,False,0%

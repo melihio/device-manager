@@ -54,6 +54,7 @@ public static class FileManager
                 };
             } 
         }
+        Console.WriteLine(updatedDevice);
         
         File.WriteAllLines(filePath, lines);
     }

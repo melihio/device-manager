@@ -71,7 +71,7 @@ public static class CommandManager
 
             var device = DeviceManager.GetDeviceByString(line);
             var deviceType = DeviceManager.GetDeviceType(device);
-            DeviceManager.GetInstance("input.txt").AddDevice(deviceType, line);
+            // DeviceManager.GetInstance("input.txt").AddDevice(deviceType, line);
             Print("device successfully added");
         }
         catch (Exception)

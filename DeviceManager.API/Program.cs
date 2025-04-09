@@ -1,4 +1,8 @@
+using System.Text.Json;
 using device_manager.managers;
+using device_manager.models;
+using HTTPApi.dto;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,13 +43,18 @@ app.MapGet("api/devices/{deviceType}-{deviceId}", (string deviceType,string devi
     }
 });
 
-app.MapPost("api/device/{device}", (string device) =>
+app.MapPost("api/device", ([FromBody] DeviceDTO dto) =>
 {
-    try
-    {
-        var d = DeviceManager.GetDeviceByString(device);
-        var deviceType = DeviceManager.GetDeviceType(d);
-        deviceManager.AddDevice(deviceType,device);
+    try {
+        Device concreteDevice = (dto.Type switch
+        {
+            "SW" => JsonSerializer.Deserialize<Smartwatch>(JsonSerializer.Serialize(dto.Device)),
+            "P"  => JsonSerializer.Deserialize<PersonalComputer>(JsonSerializer.Serialize(dto.Device)),
+            "ED" => JsonSerializer.Deserialize<EmbeddedDevice>(JsonSerializer.Serialize(dto.Device)),
+            _ => throw new ArgumentException("Invalid device type")
+        })!;
+
+        deviceManager.AddDevice(dto.Type, concreteDevice);
         return Results.Ok("Device successfully added");
     }
     catch (Exception ex)
@@ -54,12 +63,18 @@ app.MapPost("api/device/{device}", (string device) =>
     }
 });
 
-app.MapPut("api/device/{device}", (string device) =>
+app.MapPut("api/device", ([FromBody] DeviceDTO dto) =>
 {
-    try
-    {
-        var d = DeviceManager.GetDeviceByString(device);
-        deviceManager.UpdateDevice(DeviceManager.GetDeviceType(d),d);
+    try {
+        Device concreteDevice = (dto.Type switch
+        {
+            "SW" => JsonSerializer.Deserialize<Smartwatch>(JsonSerializer.Serialize(dto.Device)),
+            "P"  => JsonSerializer.Deserialize<PersonalComputer>(JsonSerializer.Serialize(dto.Device)),
+            "ED" => JsonSerializer.Deserialize<EmbeddedDevice>(JsonSerializer.Serialize(dto.Device)),
+            _ => throw new ArgumentException("Invalid device type")
+        })!;
+
+        deviceManager.UpdateDevice(dto.Type, concreteDevice);
         return Results.Ok("Device successfully updated");
     }
     catch (Exception ex)
