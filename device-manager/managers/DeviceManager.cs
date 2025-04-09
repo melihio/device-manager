@@ -58,6 +58,11 @@ public class DeviceManager
 
     public void DeleteDevice(string deviceType, string deviceId)
     {
+        var lines = FileManager.GetAllLines(_filePath);
+        if (!lines.Any(line => line.StartsWith($"{deviceType}-{deviceId},")))
+        {
+            throw new ArgumentException("Device doesn't exists.");
+        }
         FileManager.DeleteLine(_filePath, deviceType , deviceId);
         ReadDevicesFromFile();
     }

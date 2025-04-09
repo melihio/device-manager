@@ -56,6 +56,19 @@ app.MapPut("api/device/{device}", (string device) =>
     }
 });
 
+app.MapDelete("api/device/{deviceType}-{deviceId}", (string deviceType, string deviceId) =>
+{
+    try
+    {
+        deviceManager.DeleteDevice(deviceType, deviceId);
+        return Results.Ok("Device successfully deleted");
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(ex.Message);
+    }
+});
+
 app.UseHttpsRedirection();
 
 app.Run();
