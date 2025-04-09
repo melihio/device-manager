@@ -1,6 +1,8 @@
 ﻿using device_manager.managers;
 
+Console.ForegroundColor = ConsoleColor.DarkBlue;
 Console.WriteLine("type help to see available commands.");
+
 while (true)
 {
     Console.Write(">");
@@ -16,6 +18,9 @@ while (true)
     {
         case "exit":
             CommandManager.HandleExit();
+            break;
+        case "clear":
+            CommandManager.HandleClear();
             break;
         case "help":
             CommandManager.HandleHelp();       
