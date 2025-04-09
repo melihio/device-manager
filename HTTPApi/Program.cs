@@ -27,8 +27,7 @@ app.MapGet("api/devices", () =>
     }
 });
 
-
-app.MapPut("api/device/{device}", (string device) =>
+app.MapPost("api/device/{device}", (string device) =>
 {
     try
     {
