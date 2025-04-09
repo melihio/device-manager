@@ -1,8 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "device-manager", "device-manager\device-manager.csproj", "{88C36FB4-F978-4596-9EAD-B4BE066D3DA8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceManager.Logic", "DeviceManager.Logic\DeviceManager.Logic.csproj", "{88C36FB4-F978-4596-9EAD-B4BE066D3DA8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HTTPApi", "HTTPApi\HTTPApi.csproj", "{6DBA9931-19FD-4217-A9D6-67FB21826EC2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceManager.API", "DeviceManager.API\DeviceManager.API.csproj", "{6DBA9931-19FD-4217-A9D6-67FB21826EC2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceManager.Models", "DeviceManager.Models\DeviceManager.Models.csproj", "{34FA1F9C-451B-4DAB-9C31-C502C252B53B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +20,9 @@ Global
 		{6DBA9931-19FD-4217-A9D6-67FB21826EC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6DBA9931-19FD-4217-A9D6-67FB21826EC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6DBA9931-19FD-4217-A9D6-67FB21826EC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34FA1F9C-451B-4DAB-9C31-C502C252B53B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34FA1F9C-451B-4DAB-9C31-C502C252B53B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34FA1F9C-451B-4DAB-9C31-C502C252B53B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34FA1F9C-451B-4DAB-9C31-C502C252B53B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,5 +1,4 @@
 using device_manager.managers;
-using device_manager.models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,7 +11,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-var deviceManager = DeviceManager.GetInstance("../../../../device-manager/input.txt");
+var deviceManager = DeviceManager.GetInstance("../../../../DeviceManager.Logic/input.txt");
 
 app.MapGet("api/devices", () =>
 {
