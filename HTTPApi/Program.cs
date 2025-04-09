@@ -42,6 +42,20 @@ app.MapPost("api/device/{device}", (string device) =>
     }
 });
 
+app.MapPut("api/device/{device}", (string device) =>
+{
+    try
+    {
+        var d = DeviceManager.GetDeviceByString(device);
+        deviceManager.UpdateDevice(DeviceManager.GetDeviceType(d),d);
+        return Results.Ok("Device successfully updated");
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(ex.Message);
+    }
+});
+
 app.UseHttpsRedirection();
 
 app.Run();
