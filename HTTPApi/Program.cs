@@ -27,6 +27,19 @@ app.MapGet("api/devices", () =>
     }
 });
 
+app.MapGet("api/devices/{deviceType}-{deviceId}", (string deviceType,string deviceId) =>
+{
+    try
+    {
+        var devices = deviceManager.GetDeviceById(deviceType,deviceId);
+        return Results.Ok(devices);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(ex.Message);
+    }
+});
+
 app.MapPost("api/device/{device}", (string device) =>
 {
     try
