@@ -89,18 +89,18 @@ app.MapGet("api/devices/{deviceId}", (string deviceId) =>
 //     }
 // });
 //
-// app.MapDelete("api/device/{deviceType}-{deviceId}", (string deviceType, string deviceId) =>
-// {
-//     try
-//     {
-//         deviceManager.DeleteDevice(deviceType, deviceId);
-//         return Results.Ok("Device successfully deleted");
-//     }
-//     catch (Exception ex)
-//     {
-//         return Results.Problem(ex.Message);
-//     }
-// });
+app.MapDelete("api/device/{deviceId}", (string deviceId) =>
+{
+    try
+    {
+        deviceManager.DeleteDevice( deviceId);
+        return Results.Ok("Device successfully deleted");
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem(ex.Message);
+    }
+});
 
 app.UseHttpsRedirection();
 

@@ -87,15 +87,20 @@ public class DeviceManager
         // ReadDevicesFromFile();
     }
 
-    public void DeleteDevice(string deviceType, string deviceId)
+    public void DeleteDevice(string deviceId)
     {
-        // var lines = FileManager.GetAllLines(_filePath);
-        // if (!lines.Any(line => line.StartsWith($"{deviceType}-{deviceId},")))
-        // {
-        //     throw new ArgumentException("Device doesn't exists.");
-        // }
-        // FileManager.DeleteLine(_filePath, deviceType , deviceId);
-        // ReadDevicesFromFile();
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            connection.Open();
+            var sql = "DELETE FROM Devices WHERE ID = @Id";
+            var command = new SqlCommand(sql, connection);
+            command.Parameters.AddWithValue("@Id", deviceId);
+            
+            if (command.ExecuteNonQuery() == 0)
+            {
+                throw new KeyNotFoundException($"No device found with given Id");
+            }
+        }
     }
 
     public Device GetDeviceById(string deviceId)
