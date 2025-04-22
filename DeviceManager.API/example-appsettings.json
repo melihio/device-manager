@@ -1,0 +1,5 @@
+{
+  "ConnectionStrings": {
+    "DeviceManagerDB": "Server={host},{port};Database={database};User Id={Username};Password={Password};TrustServerCertificate=True;"
+  }
+}
