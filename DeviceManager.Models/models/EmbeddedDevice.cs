@@ -8,13 +8,12 @@ public class EmbeddedDevice: Device
     public string IpAddress { get; set; }
     public string NetworkName {get; set;}
 
-    public EmbeddedDevice(string ipAddress, string networkName, string id, string name, bool turnedOn)
+    public EmbeddedDevice(string ipAddress, string networkName, string id, string name)
     {
         this.IpAddress = ipAddress;
         this.NetworkName = networkName;
         this.id = id;
         this.name = name;
-        this.TurnedOn = turnedOn;
     }
 
     public override void TurnOn()
