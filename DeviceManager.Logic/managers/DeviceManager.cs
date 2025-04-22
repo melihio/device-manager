@@ -44,7 +44,7 @@ public class DeviceManager
                     var device = new Device
                     {
                         Id = id!,
-                        name = name!,
+                        Name = name!,
                         TurnedOn = turnedOn!
                     };
                     
@@ -70,7 +70,7 @@ public class DeviceManager
                 var command = new SqlCommand(Sql, conn);
 
                 command.Parameters.AddWithValue("@Id", device.Id);
-                command.Parameters.AddWithValue("@Name", device.name);
+                command.Parameters.AddWithValue("@Name", device.Name);
 
                 switch (device)
                 {
@@ -104,6 +104,7 @@ public class DeviceManager
                 
                     command.ExecuteNonQuery();
                     _devices.Add(device);
+                    ReadDevices();
             }
             catch (SqlException ex)
             {
@@ -112,10 +113,64 @@ public class DeviceManager
         };
     }
 
-    public void UpdateDevice(string deviceType, Device device)
+    public void UpdateDevice(Device device)
     {
-        // FileManager.UpdateLine(_filePath, deviceType ,device);
-        // ReadDevicesFromFile();
+        if (_devices.All(d => d.Id != device.Id))
+            throw new InvalidOperationException($"No device found with given Id");
+
+        using (var conn = new SqlConnection(_connectionString))
+        {
+            try
+            {
+                conn.Open();
+
+                const string Sql = "UPDATE Devices SET Name = @Name, DeviceType = @DeviceType, BatteryLevel = @Battery, IPAddress = @IP, WifiName = @Wifi, TurnedOn = @TurnedOn WHERE Id = @Id";
+
+                var command = new SqlCommand(Sql, conn);
+
+                command.Parameters.AddWithValue("@Id", device.Id);
+                command.Parameters.AddWithValue("@Name", device.Name);
+
+                switch (device)
+                {
+                    case Smartwatch sw:
+                        command.Parameters.AddWithValue("@DeviceType", "SW");
+                        command.Parameters.AddWithValue("@Battery", sw.Battery);
+                        command.Parameters.AddWithValue("@IP", DBNull.Value);
+                        command.Parameters.AddWithValue("@Wifi", DBNull.Value);
+                        command.Parameters.AddWithValue("@TurnedOn", sw.TurnedOn);
+                        break;
+
+                    case PersonalComputer pc:
+                        command.Parameters.AddWithValue("@DeviceType", "PC");
+                        command.Parameters.AddWithValue("@Battery", DBNull.Value);
+                        command.Parameters.AddWithValue("@IP", DBNull.Value);
+                        command.Parameters.AddWithValue("@Wifi", DBNull.Value);
+                        command.Parameters.AddWithValue("@TurnedOn", pc.TurnedOn);
+                        break;
+
+                    case EmbeddedDevice ed:
+                        command.Parameters.AddWithValue("@DeviceType", "ED");
+                        command.Parameters.AddWithValue("@Battery", DBNull.Value);
+                        command.Parameters.AddWithValue("@IP", ed.IpAddress);
+                        command.Parameters.AddWithValue("@Wifi", ed.NetworkName);
+                        command.Parameters.AddWithValue("@TurnedOn", ed.TurnedOn);
+                        break;
+
+                    default:
+                        throw new ArgumentException("Unknown device type");
+                }
+                
+                if (command.ExecuteNonQuery() == 0)
+                    throw new InvalidOperationException($"No device found with Id '{device.Id}' in the database.");
+                
+                ReadDevices();
+            }
+            catch (SqlException ex)
+            {
+                throw new InvalidOperationException($"Failed to update device: {ex.Message}");
+            }
+        }
     }
 
     public void DeleteDevice(string deviceId)
@@ -162,10 +217,10 @@ public class DeviceManager
                         networkName: reader["WifiName"].ToString()!
                     ),
                     "P" => new PersonalComputer(
-                            id: reader["Id"].ToString()!,
-                            name: reader["Name"].ToString()!,
-                            turnedOn: (bool)reader["TurnedOn"],
-                            operatingSystem: reader["operatingSystem"].ToString()
+                        id: reader["Id"].ToString()!,
+                        name: reader["Name"].ToString()!,
+                        turnedOn: (bool)reader["TurnedOn"],
+                        operatingSystem: reader["operatingSystem"].ToString()
                     ),
                 };
                 return device;
@@ -175,23 +230,5 @@ public class DeviceManager
                 throw new KeyNotFoundException("Device not found");
             }
         }
-    }
-
-    private void ReadDevicesFromFile()
-    {
-        // var lines = FileManager.GetAllLines(_filePath);
-        // foreach (var device in lines.Select(GetDeviceByString).OfType<Device>())
-        //     _devices.Add(device);
-    }
-
-    public static string GetDeviceType(Device device)
-    {
-        return device switch
-        {
-            Smartwatch => "SW",
-            PersonalComputer => "P",
-            EmbeddedDevice => "ED",
-            _ => throw new ArgumentException("Unknown device type")
-        };
     }
 }

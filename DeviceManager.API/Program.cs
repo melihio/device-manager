@@ -93,26 +93,44 @@ app.MapPost("/api/devices", ([FromBody] DeviceDTO dto) =>
     }
 });
 
-// app.MapPut("api/device", ([FromBody] DeviceDTO dto) =>
-// {
-//     try {
-//         Device concreteDevice = (dto.Type switch
-//         {
-//             "SW" => JsonSerializer.Deserialize<Smartwatch>(JsonSerializer.Serialize(dto.Device)),
-//             "P"  => JsonSerializer.Deserialize<PersonalComputer>(JsonSerializer.Serialize(dto.Device)),
-//             "ED" => JsonSerializer.Deserialize<EmbeddedDevice>(JsonSerializer.Serialize(dto.Device)),
-//             _ => throw new ArgumentException("Invalid device type")
-//         })!;
-//
-//         deviceManager.UpdateDevice(dto.Type, concreteDevice);
-//         return Results.Ok("Device successfully updated");
-//     }
-//     catch (Exception ex)
-//     {
-//         return Results.Problem(ex.Message);
-//     }
-// });
-//
+app.MapPut("/api/devices/", ([FromBody] DeviceDTO dto) =>
+{
+    try
+    {
+        Device? device = dto.Type.ToUpper() switch
+        {
+            "SW" => dto.Smartwatch != null
+                ? new Smartwatch(dto.Smartwatch.Battery, dto.Smartwatch.TurnedOn, dto.Smartwatch.Id, dto.Smartwatch.Name)
+                : null,
+            "PC" => dto.PersonalComputer != null
+                ? new PersonalComputer(dto.PersonalComputer.OperatingSystem, dto.PersonalComputer.TurnedOn,dto.PersonalComputer.Id, dto.PersonalComputer.Name)
+                : null,
+            "ED" => dto.EmbeddedDevice != null
+                ? new EmbeddedDevice(dto.EmbeddedDevice.Id, dto.EmbeddedDevice.Name, dto.EmbeddedDevice.NetworkName, dto.EmbeddedDevice.IpAddress)
+                : null,
+            _ => null
+        };
+
+        if (device == null)
+            throw new ArgumentException("Invalid device type or missing device data.");
+
+        deviceManager.UpdateDevice(device);
+        return Results.Ok();
+    }
+    catch (InvalidOperationException ex)
+    {
+        return Results.Conflict(ex.Message);
+    }
+    catch (ArgumentException ex)
+    {
+        return Results.BadRequest(ex.Message);
+    }
+    catch (Exception ex)
+    {
+        return Results.Problem("An unexpected error occurred.");
+    }
+});
+
 app.MapDelete("api/device/{deviceId}", (string deviceId) =>
 {
     try
