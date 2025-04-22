@@ -12,8 +12,8 @@ public class EmbeddedDevice: Device
     {
         this.IpAddress = ipAddress;
         this.NetworkName = networkName;
-        this.id = id;
-        this.name = name;
+        this.Id = id;
+        this.Name = name;
     }
 
     public override void TurnOn()
@@ -43,6 +43,6 @@ public class EmbeddedDevice: Device
     
     public override string ToString()
     {
-        return $"Embedded device - Name: {name} Id: {id} Network Name: {NetworkName} Ip Address: {IpAddress} Status: {TurnedOn}";
+        return $"Embedded device - Name: {Name} Id: {Id} Network Name: {NetworkName} Ip Address: {IpAddress} Status: {TurnedOn}";
     }
 }

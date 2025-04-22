@@ -43,13 +43,13 @@ public static class FileManager
             var values = lines[i].Split(',');
             var deviceInfo = values[0].Split('-');
 
-            if (deviceInfo[0] == deviceType && deviceInfo[1] == updatedDevice.id)
+            if (deviceInfo[0] == deviceType && deviceInfo[1] == updatedDevice.Id)
             {
                 lines[i] = updatedDevice switch
                 {
-                    Smartwatch sw => $"{deviceType}-{sw.id},{sw.name},{sw.TurnedOn},{sw.Battery}%",
-                    PersonalComputer pc => $"{deviceType}-{pc.id},{pc.name},{pc.TurnedOn},{pc.OperatingSystem}",
-                    EmbeddedDevice ed => $"{deviceType}-{ed.id},{ed.name},{ed.IpAddress},{ed.NetworkName}",
+                    Smartwatch sw => $"{deviceType}-{sw.Id},{sw.Name},{sw.TurnedOn},{sw.Battery}%",
+                    PersonalComputer pc => $"{deviceType}-{pc.Id},{pc.Name},{pc.TurnedOn},{pc.OperatingSystem}",
+                    EmbeddedDevice ed => $"{deviceType}-{ed.Id},{ed.Name},{ed.IpAddress},{ed.NetworkName}",
                     _ => throw new ArgumentException("Invalid device type")
                 };
             } 

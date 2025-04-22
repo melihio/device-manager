@@ -15,8 +15,8 @@ public class Smartwatch: Device, IPowerNotifier
     public Smartwatch(int battery,bool turnedOn,string id, string name)
     {
         this.Battery = battery;
-        this.id = id;
-        this.name = name;
+        this.Id = id;
+        this.Name = name;
         this.TurnedOn = turnedOn;
     }
 
@@ -50,6 +50,6 @@ public class Smartwatch: Device, IPowerNotifier
     
     public override string ToString()
     {
-        return $"SmartWatch - Name: {name} Id: {id} Battery: {Battery} Status: {TurnedOn})";
+        return $"SmartWatch - Name: {Name} Id: {Id} Battery: {Battery} Status: {TurnedOn})";
     }
 }

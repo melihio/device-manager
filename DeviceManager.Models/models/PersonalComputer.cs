@@ -18,8 +18,8 @@ public class PersonalComputer: Device
     {
         this.OperatingSystem = operatingSystem;
         this.TurnedOn = turnedOn;
-        this.id = id;
-        this.name = name;
+        this.Id = id;
+        this.Name = name;
     }
 
     public override void TurnOn()
@@ -35,6 +35,6 @@ public class PersonalComputer: Device
     
     public override string ToString()
     {
-        return $"Personal computer - Name: {name} Id: {id} OperatingSystem: {OperatingSystem} Status: {TurnedOn}";
+        return $"Personal computer - Name: {Name} Id: {Id} OperatingSystem: {OperatingSystem} Status: {TurnedOn}";
     }
 }
