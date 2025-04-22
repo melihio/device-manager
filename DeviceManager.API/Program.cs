@@ -1,4 +1,7 @@
 using device_manager.managers;
+using device_manager.models;
+using HTTPApi.dto;
+using Microsoft.AspNetCore.Mvc;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -49,26 +52,47 @@ app.MapGet("api/devices/{deviceId}", (string deviceId) =>
     }
 });
 
-// app.MapPost("api/device", ([FromBody] DeviceDTO dto) =>
-// {
-//     try {
-//         Device concreteDevice = (dto.Type switch
-//         {
-//             "SW" => JsonSerializer.Deserialize<Smartwatch>(JsonSerializer.Serialize(dto.Device)),
-//             "P"  => JsonSerializer.Deserialize<PersonalComputer>(JsonSerializer.Serialize(dto.Device)),
-//             "ED" => JsonSerializer.Deserialize<EmbeddedDevice>(JsonSerializer.Serialize(dto.Device)),
-//             _ => throw new ArgumentException("Invalid device type")
-//         })!;
-//
-//         deviceManager.AddDevice(dto.Type, concreteDevice);
-//         return Results.Created();
-//     }
-//     catch (Exception ex)
-//     {
-//         return Results.Problem(ex.Message);
-//     }
-// });
-//
+app.MapPost("/api/devices", ([FromBody] DeviceDTO dto) =>
+{
+    try
+    {
+        if (string.IsNullOrWhiteSpace(dto.Type))
+            return Results.BadRequest("Device type is required.");
+
+        Device? device = dto.Type.ToUpper() switch
+        {
+            "SW" => dto.Smartwatch != null
+                ? new Smartwatch(dto.Smartwatch.Battery, dto.Smartwatch.TurnedOn, dto.Smartwatch.Id, dto.Smartwatch.Name)
+                : null,
+            "PC" => dto.PersonalComputer != null
+                ? new PersonalComputer(dto.PersonalComputer.OperatingSystem, dto.PersonalComputer.TurnedOn,dto.PersonalComputer.Id, dto.PersonalComputer.Name)
+                : null,
+            "ED" => dto.EmbeddedDevice != null
+                ? new EmbeddedDevice(dto.EmbeddedDevice.Id, dto.EmbeddedDevice.Name, dto.EmbeddedDevice.NetworkName, dto.EmbeddedDevice.IpAddress)
+                : null,
+            _ => null
+        };
+
+        if (device == null)
+            return Results.BadRequest("Invalid device type or missing device data.");
+
+        deviceManager.AddDevice(device);
+        return Results.Created();
+    }
+    catch (InvalidOperationException ex)
+    {
+        return Results.Conflict(ex.Message); 
+    }
+    catch (ArgumentException ex)
+    {
+        return Results.BadRequest(ex.Message); 
+    }
+    catch (Exception)
+    {
+        return Results.Problem("An unexpected error occurred.");
+    }
+});
+
 // app.MapPut("api/device", ([FromBody] DeviceDTO dto) =>
 // {
 //     try {

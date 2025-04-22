@@ -26,8 +26,8 @@ public class DeviceManager
         using (var connection = new SqlConnection(_connectionString))
         {
             connection.Open();
-            var sql = "SELECT * FROM Devices";
-            var command = new SqlCommand(sql, connection);
+            const string Sql = "SELECT * FROM Devices";
+            var command = new SqlCommand(Sql, connection);
             var reader = command.ExecuteReader();
             while (reader.Read())
             {
@@ -43,8 +43,8 @@ public class DeviceManager
 
                     var device = new Device
                     {
-                        id = id!,
-                        name = name!,
+                        Id = id!,
+                        Name = name!,
                         TurnedOn = turnedOn!
                     };
                     
@@ -54,31 +54,62 @@ public class DeviceManager
         }
     }
 
-    public void AddDevice(string deviceType, Device device)
+    public void AddDevice(Device device)
     {
-        // if (_devices.Count >= 15)
-        // {
-        //     throw new InvalidOperationException("Maximum number of devices is 15");
-        // }
-        //
-        // foreach (var d in _devices)
-        // {
-        //     if (GetDeviceType(d) == deviceType && d.id == device.id)
-        //     {
-        //         throw new ArgumentException("Device with given id already exists");
-        //     }
-        // }
-        //
-        // string line = device switch
-        // {
-        //     Smartwatch sw => $"{deviceType}-{sw.id},{sw.name},{sw.TurnedOn},{sw.Battery}%",
-        //     PersonalComputer pc => $"{deviceType}-{pc.id},{pc.name},{pc.TurnedOn},{pc.OperatingSystem}",
-        //     EmbeddedDevice ed => $"{deviceType}-{ed.id},{ed.name},{ed.IpAddress},{ed.NetworkName}",
-        //     _ => throw new ArgumentException("Invalid device type")
-        // };
-        //
-        // FileManager.AddLine(_filePath, line);
-        // ReadDevicesFromFile();
+        if (_devices.Any(d => d.Id == device.Id))
+            throw new InvalidOperationException($"Device with given Id already exists");
+
+        using (var conn = new SqlConnection(_connectionString))
+        {
+            try
+            { 
+                conn.Open();
+                
+                const string Sql = "INSERT INTO Devices (Id, Name, DeviceType, BatteryLevel, IPAddress, WifiName, TurnedOn VALUES (@Id, @Name, @DeviceType, @Battery, @IP, @Wifi, @TurnedOn)";
+
+                var command = new SqlCommand(Sql, conn);
+
+                command.Parameters.AddWithValue("@Id", device.Id);
+                command.Parameters.AddWithValue("@Name", device.Name);
+
+                switch (device)
+                {
+                    case Smartwatch sw:
+                        command.Parameters.AddWithValue("@DeviceType", "SW");
+                        command.Parameters.AddWithValue("@Battery", sw.Battery);
+                        command.Parameters.AddWithValue("@IP", DBNull.Value);
+                        command.Parameters.AddWithValue("@Wifi", DBNull.Value);
+                        command.Parameters.AddWithValue("@TurnedOn", sw.TurnedOn);
+                        break;
+
+                    case PersonalComputer pc:
+                        command.Parameters.AddWithValue("@DeviceType", "PC");
+                        command.Parameters.AddWithValue("@Battery", DBNull.Value);
+                        command.Parameters.AddWithValue("@IP", DBNull.Value);
+                        command.Parameters.AddWithValue("@Wifi", DBNull.Value);
+                        command.Parameters.AddWithValue("@TurnedOn", pc.TurnedOn);
+                        break;
+
+                    case EmbeddedDevice ed:
+                        command.Parameters.AddWithValue("@DeviceType", "ED");
+                        command.Parameters.AddWithValue("@Battery", DBNull.Value);
+                        command.Parameters.AddWithValue("@IP", ed.IpAddress ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@Wifi", ed.NetworkName ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@TurnedOn", ed.TurnedOn);
+                        break;
+
+                    default:
+                        throw new ArgumentException("Unknown device type");
+                }
+                
+                    command.ExecuteNonQuery();
+                    _devices.Add(device);
+            }
+            catch (SqlException ex)
+            {
+                throw new InvalidOperationException($"Failed to add device: {ex.Message}");
+            }  
+        };
     }
 
     public void UpdateDevice(string deviceType, Device device)
@@ -92,8 +123,8 @@ public class DeviceManager
         using (var connection = new SqlConnection(_connectionString))
         {
             connection.Open();
-            var sql = "DELETE FROM Devices WHERE ID = @Id";
-            var command = new SqlCommand(sql, connection);
+            const string Sql = "DELETE FROM Devices WHERE ID = @Id";
+            var command = new SqlCommand(Sql, connection);
             command.Parameters.AddWithValue("@Id", deviceId);
             
             if (command.ExecuteNonQuery() == 0)
@@ -108,8 +139,8 @@ public class DeviceManager
         using (var connection = new SqlConnection(_connectionString))
         {
             connection.Open();
-            var sql = "SELECT * FROM Devices WHERE Id = @id";
-            var command = new SqlCommand(sql, connection);
+            const string Sql = "SELECT * FROM Devices WHERE Id = @id";
+            var command = new SqlCommand(Sql, connection);
             command.Parameters.AddWithValue("@id", deviceId);
             var reader = command.ExecuteReader();
             if (reader.HasRows)
