@@ -22,9 +22,15 @@ public class PersonalComputer: Device
         this.Name = name;
     }
 
-    public override void TurnOn()
+    public override void Validate()
     {
         if (OperatingSystem == null) throw new EmptySystemException();
+    }
+
+    public override void TurnOn()
+    {
+        
+        Validate();
         TurnedOn = true;
     }
 

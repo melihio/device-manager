@@ -1,3 +1,4 @@
+using device_manager.exceptions;
 using device_manager.managers;
 using device_manager.models;
 using HTTPApi.dto;
@@ -54,37 +55,39 @@ app.MapPost("/api/devices", ([FromBody] DeviceDTO dto) =>
         if (string.IsNullOrWhiteSpace(dto.Type))
             return Results.BadRequest("Device type is required.");
 
-        Device? device = dto.Type.ToUpper() switch
+        Device device = dto.Type.ToUpper() switch
         {
-            "SW" => dto.Smartwatch != null
+            "SW" => dto.Smartwatch != null && int.TryParse(dto.Smartwatch.Battery.ToString(), out _)
                 ? new Smartwatch(dto.Smartwatch.Battery, dto.Smartwatch.TurnedOn, dto.Smartwatch.Id, dto.Smartwatch.Name)
-                : null,
+                : throw new ArgumentException("Missing or invalid parameters"),
             "PC" => dto.PersonalComputer != null
                 ? new PersonalComputer(dto.PersonalComputer.OperatingSystem, dto.PersonalComputer.TurnedOn,dto.PersonalComputer.Id, dto.PersonalComputer.Name)
-                : null,
+                : throw new ArgumentException("Missing or invalid parameters"),
             "ED" => dto.EmbeddedDevice != null
                 ? new EmbeddedDevice(dto.EmbeddedDevice.Id, dto.EmbeddedDevice.Name, dto.EmbeddedDevice.NetworkName, dto.EmbeddedDevice.IpAddress)
-                : null,
-            _ => null
+                : throw new ArgumentException("Missing or invalid parameters"),
+            _ => throw new ArgumentException("Invalid device type"),
         };
-
-        if (device == null)
-            return Results.BadRequest("Invalid device type or missing device data.");
-
+        
+        if (!bool.TryParse(device.TurnedOn.ToString(), out _))
+        {
+            throw new ArgumentException("Missing or invalid parameters: TurnedOn");
+        }
+        
+        device.Validate();
         deviceManager.AddDevice(device);
+        
         return Results.Created();
     }
-    catch (InvalidOperationException ex)
+    catch (Exception ex)
     {
-        return Results.Conflict(ex.Message); 
-    }
-    catch (ArgumentException ex)
-    {
-        return Results.BadRequest(ex.Message); 
-    }
-    catch (Exception)
-    {
-        return Results.Problem("unexpected error occurred.");
+        return ex switch
+        {
+            KeyNotFoundException => Results.NotFound(ex.Message),
+            ArgumentException or EmptyBatteryException or ArgumentOutOfRangeException or EmptySystemException or ConnectionException => Results.BadRequest(ex.Message),
+            InvalidOperationException => Results.Conflict(ex.Message),
+            _ => Results.Problem("An unexpected error occurred.")
+        };
     }
 });
 
@@ -92,37 +95,42 @@ app.MapPut("/api/devices/", ([FromBody] DeviceDTO dto) =>
 {
     try
     {
-        Device? device = dto.Type.ToUpper() switch
+        if (string.IsNullOrWhiteSpace(dto.Type))
+            return Results.BadRequest("Device type is required.");
+
+        Device device = dto.Type.ToUpper() switch
         {
-            "SW" => dto.Smartwatch != null
+            "SW" => dto.Smartwatch != null && int.TryParse(dto.Smartwatch.Battery.ToString(), out _)
                 ? new Smartwatch(dto.Smartwatch.Battery, dto.Smartwatch.TurnedOn, dto.Smartwatch.Id, dto.Smartwatch.Name)
-                : null,
+                : throw new ArgumentException("Missing or invalid parameters"),
             "PC" => dto.PersonalComputer != null
                 ? new PersonalComputer(dto.PersonalComputer.OperatingSystem, dto.PersonalComputer.TurnedOn,dto.PersonalComputer.Id, dto.PersonalComputer.Name)
-                : null,
+                : throw new ArgumentException("Missing or invalid parameters"),
             "ED" => dto.EmbeddedDevice != null
                 ? new EmbeddedDevice(dto.EmbeddedDevice.Id, dto.EmbeddedDevice.Name, dto.EmbeddedDevice.NetworkName, dto.EmbeddedDevice.IpAddress)
-                : null,
-            _ => null
+                : throw new ArgumentException("Missing or invalid parameters"),
+            _ => throw new ArgumentException("Invalid device type"),
         };
+        
+        if (!bool.TryParse(device.TurnedOn.ToString(), out _))
+        {
+            throw new ArgumentException("Missing or invalid parameters: TurnedOn");
+        }
 
-        if (device == null)
-            throw new ArgumentException("Invalid device type or missing device data.");
+        device.Validate();
 
         deviceManager.UpdateDevice(device);
         return Results.Ok();
     }
-    catch (InvalidOperationException ex)
-    {
-        return Results.Conflict(ex.Message);
-    }
-    catch (ArgumentException ex)
-    {
-        return Results.BadRequest(ex.Message);
-    }
     catch (Exception ex)
     {
-        return Results.Problem("An unexpected error occurred.");
+        return ex switch
+        {
+            KeyNotFoundException => Results.NotFound(ex.Message),
+            ArgumentException or EmptyBatteryException or ArgumentOutOfRangeException or EmptySystemException or ConnectionException => Results.BadRequest(ex.Message),
+            InvalidOperationException => Results.Conflict(ex.Message),
+            _ => Results.Problem("An unexpected error occurred.")
+        };
     }
 });
 
@@ -132,6 +140,10 @@ app.MapDelete("api/device/{deviceId}", (string deviceId) =>
     {
         deviceManager.DeleteDevice( deviceId);
         return Results.Ok("Device successfully deleted");
+    }
+    catch (KeyNotFoundException ex)
+    {
+        return Results.NotFound(ex.Message);
     }
     catch (Exception ex)
     {

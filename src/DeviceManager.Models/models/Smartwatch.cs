@@ -5,7 +5,7 @@ namespace device_manager.models;
 
 interface IPowerNotifier
 {
-    bool CheckBattery();
+    void CheckBattery();
 }
 
 public class Smartwatch: Device, IPowerNotifier
@@ -31,20 +31,19 @@ public class Smartwatch: Device, IPowerNotifier
         TurnedOn = false;
     }
 
-    public bool CheckBattery()
+    public override void Validate()
+    {
+        CheckBattery();
+    }
+
+    public void CheckBattery()
     {
         switch (Battery)
         {
             case > 100:
-                Console.WriteLine("battery level higher than 100");
-                return false;
-            case < 10:
-                throw new EmptyBatteryException();
+                throw new ArgumentOutOfRangeException(nameof(Battery), "Battery percentage more than 100%");
             case < 20:
-                Console.WriteLine("battery too low.");
-                return false;
-            default:
-                return true;
+                throw new EmptyBatteryException();
         }
     }
     

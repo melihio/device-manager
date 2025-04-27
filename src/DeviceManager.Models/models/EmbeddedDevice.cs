@@ -26,19 +26,23 @@ public class EmbeddedDevice: Device
     {
         TurnedOn = false;
     }
-    
-    public void Connect()
+
+    public override void Validate()
     {
         string ipPattern = @"^((25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|1?[0-9][0-9]?)$";
-        if (!Regex.IsMatch(this.IpAddress, ipPattern))
+        if (!Regex.IsMatch(IpAddress, ipPattern))
         {
             throw new ArgumentException("Invalid IP address");
         }
-
-        if (!this.NetworkName.Contains("MD Ltd."))
+        if (!NetworkName.Contains("MD Ltd."))
         {
             throw new ConnectionException();
         }
+    }
+    
+    public void Connect()
+    {
+        Validate();
     }
     
     public override string ToString()

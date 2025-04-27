@@ -144,7 +144,7 @@ public class DeviceManager
     public void UpdateDevice(Device device)
     {
         if (_devices.All(d => d.Id != device.Id))
-            throw new InvalidOperationException($"No device found with given Id");
+            throw new KeyNotFoundException($"No device found with given Id");
 
         using var conn = new SqlConnection(_connectionString);
         try

@@ -8,4 +8,5 @@ public class Device
 
     public virtual void TurnOn(){}
     public virtual void TurnOff(){}
+    public virtual void Validate(){}
 }
