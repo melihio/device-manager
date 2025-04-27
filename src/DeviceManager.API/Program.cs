@@ -20,15 +20,16 @@ builder.Services.AddSingleton<DeviceManager>(sp => new DeviceManager(connectionS
 
 var app = builder.Build();
 
-try
-{
-    var dbManager = app.Services.GetRequiredService<DatabaseManager>();
-    dbManager.Initialize("../DeviceManager.Logic/input.txt");
-}
-catch (Exception ex)
-{
-    Console.WriteLine("An error occured during initialization" + ex.Message);
-}
+//this needs to run on first time
+// try
+// {
+//     var dbManager = app.Services.GetRequiredService<DatabaseManager>();
+//     dbManager.Initialize("../DeviceManager.Logic/input.txt");
+// }
+// catch (Exception ex)
+// {
+//     Console.WriteLine("An error occured during initialization" + ex.Message);
+// }
 
 var deviceManager = app.Services.GetRequiredService<DeviceManager>();
 

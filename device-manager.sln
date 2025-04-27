@@ -1,10 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceManager.Logic", "DeviceManager.Logic\DeviceManager.Logic.csproj", "{88C36FB4-F978-4596-9EAD-B4BE066D3DA8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceManager.Logic", "src/DeviceManager.Logic\DeviceManager.Logic.csproj", "{88C36FB4-F978-4596-9EAD-B4BE066D3DA8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceManager.API", "DeviceManager.API\DeviceManager.API.csproj", "{6DBA9931-19FD-4217-A9D6-67FB21826EC2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceManager.API", "src/DeviceManager.API\DeviceManager.API.csproj", "{6DBA9931-19FD-4217-A9D6-67FB21826EC2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceManager.Models", "DeviceManager.Models\DeviceManager.Models.csproj", "{34FA1F9C-451B-4DAB-9C31-C502C252B53B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceManager.Models", "src/DeviceManager.Models\DeviceManager.Models.csproj", "{34FA1F9C-451B-4DAB-9C31-C502C252B53B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A69CB416-1A6D-4F47-A0D2-B2DD8CA35FA3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
