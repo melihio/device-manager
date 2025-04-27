@@ -8,21 +8,27 @@ var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("DeviceManagerDB");
 
+if (connectionString == null)
+{
+    Console.WriteLine("Connection string not defined");
+    Environment.Exit(-1);
+}
+
 builder.Services.AddOpenApi();
 builder.Services.AddSingleton<DatabaseManager>(sp => new DatabaseManager(connectionString!));
 builder.Services.AddSingleton<DeviceManager>(sp => new DeviceManager(connectionString!));
 
 var app = builder.Build();
 
-// try
-// {
-//     var dbManager = app.Services.GetRequiredService<DatabaseManager>();
-//     dbManager.Initialize("../DeviceManager.Logic/input.txt");
-// }
-// catch (Exception ex)
-// {
-//     Console.WriteLine("An error occured during initialization" + ex.Message);
-// }
+try
+{
+    var dbManager = app.Services.GetRequiredService<DatabaseManager>();
+    dbManager.Initialize("../DeviceManager.Logic/input.txt");
+}
+catch (Exception ex)
+{
+    Console.WriteLine("An error occured during initialization" + ex.Message);
+}
 
 var deviceManager = app.Services.GetRequiredService<DeviceManager>();
 
@@ -89,7 +95,7 @@ app.MapPost("/api/devices", ([FromBody] DeviceDTO dto) =>
     }
     catch (Exception)
     {
-        return Results.Problem("An unexpected error occurred.");
+        return Results.Problem("unexpected error occurred.");
     }
 });
 

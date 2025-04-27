@@ -65,7 +65,7 @@ public class DeviceManager
             { 
                 conn.Open();
                 
-                const string Sql = "INSERT INTO Devices (Id, Name, DeviceType, BatteryLevel, IPAddress, WifiName, TurnedOn VALUES (@Id, @Name, @DeviceType, @Battery, @IP, @Wifi, @TurnedOn)";
+                const string Sql = "INSERT INTO Devices (Id, Name, DeviceType, BatteryLevel, IPAddress, WifiName, TurnedOn) VALUES (@Id, @Name, @DeviceType, @Battery, @IP, @Wifi, @TurnedOn)";
 
                 var command = new SqlCommand(Sql, conn);
 
