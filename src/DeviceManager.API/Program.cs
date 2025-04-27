@@ -20,9 +20,8 @@ builder.Services.AddSingleton<DeviceManager>(sp => new DeviceManager(connectionS
 
 var app = builder.Build();
 
-var deviceManager = app.Services.GetRequiredService<DeviceManager>();
 
-app.MapGet("api/devices", () =>
+app.MapGet("api/devices", (DeviceManager deviceManager) =>
 {
     try
     {
@@ -35,7 +34,7 @@ app.MapGet("api/devices", () =>
     }
 });
 
-app.MapGet("api/devices/{deviceId}", (string deviceId) =>
+app.MapGet("api/devices/{deviceId}", (string deviceId,DeviceManager deviceManager) =>
 {
     try
     {
@@ -48,7 +47,7 @@ app.MapGet("api/devices/{deviceId}", (string deviceId) =>
     }
 });
 
-app.MapPost("/api/devices", ([FromBody] DeviceDTO dto) =>
+app.MapPost("/api/devices", ([FromBody] DeviceDTO dto,DeviceManager deviceManager) =>
 {
     try
     {
@@ -91,7 +90,7 @@ app.MapPost("/api/devices", ([FromBody] DeviceDTO dto) =>
     }
 });
 
-app.MapPut("/api/devices/", ([FromBody] DeviceDTO dto) =>
+app.MapPut("/api/devices/", ([FromBody] DeviceDTO dto,DeviceManager deviceManager) =>
 {
     try
     {
@@ -134,12 +133,12 @@ app.MapPut("/api/devices/", ([FromBody] DeviceDTO dto) =>
     }
 });
 
-app.MapDelete("api/device/{deviceId}", (string deviceId) =>
+app.MapDelete("api/device/{deviceId}", (string deviceId,DeviceManager deviceManager) =>
 {
     try
     {
         deviceManager.DeleteDevice( deviceId);
-        return Results.Ok("Device successfully deleted");
+        return Results.Ok();
     }
     catch (KeyNotFoundException ex)
     {
