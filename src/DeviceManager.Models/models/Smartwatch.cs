@@ -14,10 +14,10 @@ public class Smartwatch: Device, IPowerNotifier
 
     public Smartwatch(int battery,bool turnedOn,string id, string name)
     {
-        this.Battery = battery;
-        this.Id = id;
-        this.Name = name;
-        this.TurnedOn = turnedOn;
+        Battery = battery;
+        Id = id;
+        Name = name;
+        TurnedOn = turnedOn;
     }
 
     public override void TurnOn()

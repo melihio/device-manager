@@ -2,7 +2,7 @@
 
 - [x] Fix file structure
 - [x] Update db schema
-- [ ] Check and implement validations (code 400 if failed)
-- [ ] Dependency injection
+- [x] Check and implement validations
+- [x] Dependency injection
 - [ ] Add xml comments
 - [ ] Add tests
