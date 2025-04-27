@@ -16,11 +16,17 @@ public class DeviceManager
     
     private readonly List<Device> _devices;
 
+    /// <summary>
+    ///  Returns all the devices in memory. Returning from memory is not a problem since the list is updated after every CRUD operation. 
+    /// </summary>
     public List<Device> GetAllDevices()
     {
         return _devices;
     }
 
+    /// <summary>
+    ///  This method reads all devices from database. This method is called after every CRUD operation executed.
+    /// </summary>
     public void ReadDevices()
     {
         _devices.Clear();
@@ -84,6 +90,10 @@ public class DeviceManager
         }
     }
 
+    /// <summary>
+    ///  This method adds given device to database.
+    /// </summary>
+
     public void AddDevice(Device device)
     {
         if (_devices.Any(d => d.Id == device.Id))
@@ -140,6 +150,10 @@ public class DeviceManager
             throw new InvalidOperationException($"Failed to add device: {ex.Message}");
         }
     }
+
+    /// <summary>
+    ///  This method updates an already existing device in the database
+    /// </summary>
 
     public void UpdateDevice(Device device)
     {
@@ -200,6 +214,10 @@ public class DeviceManager
         }
     }
 
+    /// <summary>
+    ///  This method deletes an existing device from database.
+    /// </summary>
+
     public void DeleteDevice(string deviceId)
     {
         using var connection = new SqlConnection(_connectionString);
@@ -223,6 +241,10 @@ public class DeviceManager
 
         ReadDevices();
     }
+
+    /// <summary>
+    ///  This method returns a single device with given id.
+    /// </summary>
 
     public Device GetDeviceById(string deviceId)
     {

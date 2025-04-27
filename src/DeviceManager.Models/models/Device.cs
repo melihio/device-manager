@@ -1,5 +1,8 @@
 namespace device_manager.models;
 
+/// <summary>
+///  A base class for existing models.
+/// </summary>
 public class Device
 {
     public bool TurnedOn { get; set; }
