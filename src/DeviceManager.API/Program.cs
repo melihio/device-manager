@@ -3,8 +3,8 @@ using device_manager.exceptions;
 using device_manager.managers;
 using device_manager.models;
 using HTTPApi.dto;
+using HTTPApi.utils;
 using Microsoft.AspNetCore.Mvc;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,11 +16,10 @@ if (connectionString == null)
     Environment.Exit(-1);
 }
 
-builder.Services.AddOpenApi();
-builder.Services.AddSingleton<DeviceManager>(sp => new DeviceManager(connectionString!));
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSingleton<DeviceManager>(sp => new DeviceManager(connectionString));
 
 var app = builder.Build();
-
 
 app.MapGet("api/devices", (DeviceManager deviceManager) =>
 {
@@ -35,12 +34,12 @@ app.MapGet("api/devices", (DeviceManager deviceManager) =>
     }
 });
 
-app.MapGet("api/devices/{deviceId}", (string deviceId,DeviceManager deviceManager) =>
+app.MapGet("api/devices/{deviceId}", (string deviceId, DeviceManager deviceManager) =>
 {
     try
     {
-        var devices = deviceManager.GetDeviceById(deviceId);
-        return Results.Ok(devices);
+        var device = deviceManager.GetDeviceById(deviceId);
+        return Results.Ok(device);
     }
     catch (Exception ex)
     {
@@ -53,14 +52,14 @@ app.MapPost("/api/devices", async (HttpRequest request, DeviceManager deviceMana
     try
     {
         DeviceDTO? dto = null;
-        
+
         if (request.ContentType == "application/json")
         {
             dto = await JsonSerializer.DeserializeAsync<DeviceDTO>(request.Body);
         }
         else if (request.ContentType == "text/plain")
         {
-            string body = await new StreamReader(request.Body).ReadToEndAsync();
+            var body = await new StreamReader(request.Body).ReadToEndAsync();
             if (string.IsNullOrWhiteSpace(body))
                 return Results.BadRequest("Request body is empty.");
             dto = JsonSerializer.Deserialize<DeviceDTO>(body);
@@ -69,28 +68,32 @@ app.MapPost("/api/devices", async (HttpRequest request, DeviceManager deviceMana
         if (dto == null || string.IsNullOrWhiteSpace(dto.Type))
             return Results.BadRequest("Device type is required.");
 
-        Device device = dto.Type.ToUpper() switch
+        Device device = dto.Type.ToLower() switch
         {
-            "SW" => dto.Smartwatch != null && int.TryParse(dto.Smartwatch.Battery.ToString(), out _)
-                ? new Smartwatch(dto.Smartwatch.Battery, dto.Smartwatch.TurnedOn, dto.Smartwatch.Id, dto.Smartwatch.Name)
-                : throw new ArgumentException("Missing or invalid parameters"),
-            "PC" => dto.PersonalComputer != null
-                ? new PersonalComputer(dto.PersonalComputer.OperatingSystem, dto.PersonalComputer.TurnedOn, dto.PersonalComputer.Id, dto.PersonalComputer.Name)
-                : throw new ArgumentException("Missing or invalid parameters"),
-            "ED" => dto.EmbeddedDevice != null
-                ? new EmbeddedDevice(dto.EmbeddedDevice.Id, dto.EmbeddedDevice.Name, dto.EmbeddedDevice.NetworkName, dto.EmbeddedDevice.IpAddress)
-                : throw new ArgumentException("Missing or invalid parameters"),
-            _ => throw new ArgumentException("Invalid device type"),
+            "sw" => new Smartwatch(
+                battery: dto.Battery ?? throw new ArgumentException("Battery is required for Smartwatch"),
+                turnedOn: dto.TurnedOn,
+                id: Utils.GenerateDeviceId("ED",deviceManager.GetAllDevices()),
+                name: dto.Name
+            ),
+            "pc" => new PersonalComputer(
+                operatingSystem: dto.OperatingSystem ?? throw new ArgumentException("OperatingSystem is required for PersonalComputer"),
+                turnedOn: dto.TurnedOn,
+                id: Utils.GenerateDeviceId("ED",deviceManager.GetAllDevices()),
+                name: dto.Name
+            ),
+            "ed" => new EmbeddedDevice(
+                networkName: dto.NetworkName ?? throw new ArgumentException("NetworkName is required for EmbeddedDevice"),
+                ipAddress: dto.IpAddress ?? throw new ArgumentException("IpAddress is required for EmbeddedDevice"),
+                id: Utils.GenerateDeviceId("ED",deviceManager.GetAllDevices()),
+                name: dto.Name
+            ),
+            _ => throw new ArgumentException($"Invalid device type: {dto.Type}")
         };
-
-        if (!bool.TryParse(device.TurnedOn.ToString(), out _))
-        {
-            throw new ArgumentException("Missing or invalid parameters: TurnedOn");
-        }
 
         device.Validate();
         deviceManager.AddDevice(device);
-        return Results.Created();
+        return Results.Created($"/api/devices/{device.Id}", device);
     }
     catch (Exception ex)
     {
@@ -104,35 +107,37 @@ app.MapPost("/api/devices", async (HttpRequest request, DeviceManager deviceMana
     }
 });
 
-
-app.MapPut("/api/devices/", ([FromBody] DeviceDTO dto,DeviceManager deviceManager) =>
+app.MapPut("/api/devices", ([FromBody] DeviceDTO dto, DeviceManager deviceManager) =>
 {
     try
     {
         if (string.IsNullOrWhiteSpace(dto.Type))
             return Results.BadRequest("Device type is required.");
 
-        Device device = dto.Type.ToUpper() switch
+        Device device = dto.Type.ToLower() switch
         {
-            "SW" => dto.Smartwatch != null && int.TryParse(dto.Smartwatch.Battery.ToString(), out _)
-                ? new Smartwatch(dto.Smartwatch.Battery, dto.Smartwatch.TurnedOn, dto.Smartwatch.Id, dto.Smartwatch.Name)
-                : throw new ArgumentException("Missing or invalid parameters"),
-            "PC" => dto.PersonalComputer != null
-                ? new PersonalComputer(dto.PersonalComputer.OperatingSystem, dto.PersonalComputer.TurnedOn,dto.PersonalComputer.Id, dto.PersonalComputer.Name)
-                : throw new ArgumentException("Missing or invalid parameters"),
-            "ED" => dto.EmbeddedDevice != null
-                ? new EmbeddedDevice(dto.EmbeddedDevice.Id, dto.EmbeddedDevice.Name, dto.EmbeddedDevice.NetworkName, dto.EmbeddedDevice.IpAddress)
-                : throw new ArgumentException("Missing or invalid parameters"),
-            _ => throw new ArgumentException("Invalid device type"),
+            "sw" => new Smartwatch(
+                battery: dto.Battery ?? throw new ArgumentException("Battery is required for Smartwatch"),
+                turnedOn: dto.TurnedOn,
+                id: Utils.GenerateDeviceId("SW",deviceManager.GetAllDevices()),
+                name: dto.Name
+            ),
+            "pc" => new PersonalComputer(
+                operatingSystem: dto.OperatingSystem ?? throw new ArgumentException("OperatingSystem is required for PersonalComputer"),
+                turnedOn: dto.TurnedOn,
+                id: Utils.GenerateDeviceId("PC",deviceManager.GetAllDevices()),
+                name: dto.Name
+            ),
+            "ed" => new EmbeddedDevice(
+                networkName: dto.NetworkName ?? throw new ArgumentException("NetworkName is required for EmbeddedDevice"),
+                ipAddress: dto.IpAddress ?? throw new ArgumentException("IpAddress is required for EmbeddedDevice"),
+                id: Utils.GenerateDeviceId("ED",deviceManager.GetAllDevices()),
+                name: dto.Name
+            ),
+            _ => throw new ArgumentException($"Invalid device type: {dto.Type}")
         };
-        
-        if (!bool.TryParse(device.TurnedOn.ToString(), out _))
-        {
-            throw new ArgumentException("Missing or invalid parameters: TurnedOn");
-        }
 
         device.Validate();
-
         deviceManager.UpdateDevice(device);
         return Results.Ok();
     }
@@ -148,11 +153,11 @@ app.MapPut("/api/devices/", ([FromBody] DeviceDTO dto,DeviceManager deviceManage
     }
 });
 
-app.MapDelete("api/device/{deviceId}", (string deviceId,DeviceManager deviceManager) =>
+app.MapDelete("api/device/{deviceId}", (string deviceId, DeviceManager deviceManager) =>
 {
     try
     {
-        deviceManager.DeleteDevice( deviceId);
+        deviceManager.DeleteDevice(deviceId);
         return Results.Ok();
     }
     catch (KeyNotFoundException ex)

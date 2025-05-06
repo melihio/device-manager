@@ -10,26 +10,23 @@ public class DeviceManager
     public DeviceManager(string connectionString)
     {
         _connectionString = connectionString;
-        _devices = [];
         ReadDevices();
     }
-    
-    private readonly List<Device> _devices;
 
     /// <summary>
-    ///  Returns all the devices in memory. Returning from memory is not a problem since the list is updated after every CRUD operation. 
+    ///  Returns all the devices in database 
     /// </summary>
     public List<Device> GetAllDevices()
     {
-        return _devices;
+        return ReadDevices();
     }
 
     /// <summary>
     ///  This method reads all devices from database. This method is called after every CRUD operation executed.
     /// </summary>
-    public void ReadDevices()
+    public List<Device> ReadDevices()
     {
-        _devices.Clear();
+        List<Device> _devices = new List<Device>();
 
         using var conn = new SqlConnection(_connectionString);
         conn.Open();
@@ -88,6 +85,7 @@ public class DeviceManager
 
             _devices.Add(device);
         }
+        return _devices;
     }
 
     /// <summary>
@@ -96,6 +94,7 @@ public class DeviceManager
 
     public void AddDevice(Device device)
     {
+        List<Device> _devices = GetAllDevices();
         if (_devices.Any(d => d.Id == device.Id))
             throw new InvalidOperationException($"Device with given Id already exists");
 
@@ -154,9 +153,9 @@ public class DeviceManager
     /// <summary>
     ///  This method updates an already existing device in the database
     /// </summary>
-
     public void UpdateDevice(Device device)
     {
+        List<Device> _devices = GetAllDevices();
         if (_devices.All(d => d.Id != device.Id))
             throw new KeyNotFoundException($"No device found with given Id");
 
