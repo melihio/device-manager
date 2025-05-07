@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceManager.Models", "src
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{A69CB416-1A6D-4F47-A0D2-B2DD8CA35FA3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DeviceManager.Repository", "src\DeviceManager.Repository\DeviceManager.Repository.csproj", "{F477813A-4B5E-447F-8971-FA2023381168}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,5 +28,9 @@ Global
 		{34FA1F9C-451B-4DAB-9C31-C502C252B53B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{34FA1F9C-451B-4DAB-9C31-C502C252B53B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{34FA1F9C-451B-4DAB-9C31-C502C252B53B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F477813A-4B5E-447F-8971-FA2023381168}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F477813A-4B5E-447F-8971-FA2023381168}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F477813A-4B5E-447F-8971-FA2023381168}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F477813A-4B5E-447F-8971-FA2023381168}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

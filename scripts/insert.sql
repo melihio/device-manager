@@ -12,4 +12,7 @@ INSERT INTO PersonalComputer (OperationSystem, DeviceId) VALUES
 INSERT INTO Embedded (IpAddress, NetworkName, DeviceId) VALUES
                                                             ('192.168.1.44', 'MD Ltd.Wifi-1', 'ED-1'),
                                                             ('192.168.1.45', 'eduroam', 'ED-2');
+
+
+DROP DATABASE device_manager_db
                                                             

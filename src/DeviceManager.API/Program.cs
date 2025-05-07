@@ -21,11 +21,11 @@ builder.Services.AddSingleton<DeviceManager>(sp => new DeviceManager(connectionS
 
 var app = builder.Build();
 
-app.MapGet("api/devices", (DeviceManager deviceManager) =>
+app.MapGet("api/devices", async (DeviceManager deviceManager) =>
 {
     try
     {
-        var devices = deviceManager.GetAllDevices();
+        var devices = await deviceManager.GetAllDevices();
         return Results.Ok(devices);
     }
     catch (Exception ex)
@@ -34,11 +34,11 @@ app.MapGet("api/devices", (DeviceManager deviceManager) =>
     }
 });
 
-app.MapGet("api/devices/{deviceId}", (string deviceId, DeviceManager deviceManager) =>
+app.MapGet("api/devices/{deviceId}", async (string deviceId, DeviceManager deviceManager) =>
 {
     try
     {
-        var device = deviceManager.GetDeviceById(deviceId);
+        var device = await deviceManager.GetDeviceById(deviceId);
         return Results.Ok(device);
     }
     catch (Exception ex)
@@ -47,7 +47,7 @@ app.MapGet("api/devices/{deviceId}", (string deviceId, DeviceManager deviceManag
     }
 });
 
-app.MapPost("/api/devices", async (HttpRequest request, DeviceManager deviceManager) =>
+app.MapPost("/api/devices", async (HttpRequest request, DeviceManager deviceManager, ILogger<Program> logger) =>
 {
     try
     {
@@ -73,26 +73,26 @@ app.MapPost("/api/devices", async (HttpRequest request, DeviceManager deviceMana
             "sw" => new Smartwatch(
                 battery: dto.Battery ?? throw new ArgumentException("Battery is required for Smartwatch"),
                 turnedOn: dto.TurnedOn,
-                id: Utils.GenerateDeviceId("ED",deviceManager.GetAllDevices()),
+                id: Utils.GenerateDeviceId("SW", await deviceManager.GetAllDevices()),
                 name: dto.Name
             ),
-            "pc" => new PersonalComputer(
+            "p" => new PersonalComputer(
                 operatingSystem: dto.OperatingSystem ?? throw new ArgumentException("OperatingSystem is required for PersonalComputer"),
                 turnedOn: dto.TurnedOn,
-                id: Utils.GenerateDeviceId("ED",deviceManager.GetAllDevices()),
+                id: Utils.GenerateDeviceId("P", await deviceManager.GetAllDevices()),
                 name: dto.Name
             ),
             "ed" => new EmbeddedDevice(
                 networkName: dto.NetworkName ?? throw new ArgumentException("NetworkName is required for EmbeddedDevice"),
                 ipAddress: dto.IpAddress ?? throw new ArgumentException("IpAddress is required for EmbeddedDevice"),
-                id: Utils.GenerateDeviceId("ED",deviceManager.GetAllDevices()),
+                id: Utils.GenerateDeviceId("ED", await deviceManager.GetAllDevices()),
                 name: dto.Name
             ),
             _ => throw new ArgumentException($"Invalid device type: {dto.Type}")
         };
 
         device.Validate();
-        deviceManager.AddDevice(device);
+        await deviceManager.AddDevice(device);
         return Results.Created($"/api/devices/{device.Id}", device);
     }
     catch (Exception ex)
@@ -102,40 +102,35 @@ app.MapPost("/api/devices", async (HttpRequest request, DeviceManager deviceMana
             KeyNotFoundException => Results.NotFound(ex.Message),
             ArgumentException or EmptyBatteryException or ArgumentOutOfRangeException or EmptySystemException or ConnectionException => Results.BadRequest(ex.Message),
             InvalidOperationException => Results.Conflict(ex.Message),
-            _ => Results.Problem("An unexpected error occurred.")
+            _ => Results.Problem($"An unexpected error occurred: {ex.Message}")
         };
     }
 });
 
-app.MapPut("/api/devices", ([FromBody] DeviceDTO dto, DeviceManager deviceManager) =>
+app.MapPut("/api/devices", async ([FromBody] DeviceDTO dto, DeviceManager deviceManager) =>
 {
     try
     {
         if (string.IsNullOrWhiteSpace(dto.Type))
             return Results.BadRequest("Device type is required.");
 
-        Device device = dto.Type.ToLower() switch
+        var device = await deviceManager.GetDeviceById(dto.Id);
+        
+        device.Name = dto.Name;
+        device.TurnedOn = dto.TurnedOn; 
+        switch (device)
         {
-            "sw" => new Smartwatch(
-                battery: dto.Battery ?? throw new ArgumentException("Battery is required for Smartwatch"),
-                turnedOn: dto.TurnedOn,
-                id: Utils.GenerateDeviceId("SW",deviceManager.GetAllDevices()),
-                name: dto.Name
-            ),
-            "pc" => new PersonalComputer(
-                operatingSystem: dto.OperatingSystem ?? throw new ArgumentException("OperatingSystem is required for PersonalComputer"),
-                turnedOn: dto.TurnedOn,
-                id: Utils.GenerateDeviceId("PC",deviceManager.GetAllDevices()),
-                name: dto.Name
-            ),
-            "ed" => new EmbeddedDevice(
-                networkName: dto.NetworkName ?? throw new ArgumentException("NetworkName is required for EmbeddedDevice"),
-                ipAddress: dto.IpAddress ?? throw new ArgumentException("IpAddress is required for EmbeddedDevice"),
-                id: Utils.GenerateDeviceId("ED",deviceManager.GetAllDevices()),
-                name: dto.Name
-            ),
-            _ => throw new ArgumentException($"Invalid device type: {dto.Type}")
-        };
+            case Smartwatch sw:
+                sw.Battery = dto.Battery!.Value;
+                break;
+            case PersonalComputer pc:
+                pc.OperatingSystem = dto.OperatingSystem!;
+                break;
+            case EmbeddedDevice ed:
+                ed.IpAddress   = dto.IpAddress!;
+                ed.NetworkName = dto.NetworkName!;
+                break;
+        }
 
         device.Validate();
         deviceManager.UpdateDevice(device);
@@ -153,11 +148,11 @@ app.MapPut("/api/devices", ([FromBody] DeviceDTO dto, DeviceManager deviceManage
     }
 });
 
-app.MapDelete("api/device/{deviceId}", (string deviceId, DeviceManager deviceManager) =>
+app.MapDelete("api/device/{deviceId}", async (string deviceId, DeviceManager deviceManager) =>
 {
     try
     {
-        deviceManager.DeleteDevice(deviceId);
+        await deviceManager.DeleteDevice(deviceId);
         return Results.Ok();
     }
     catch (KeyNotFoundException ex)

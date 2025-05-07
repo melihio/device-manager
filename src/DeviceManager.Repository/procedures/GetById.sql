@@ -1,0 +1,8 @@
+CREATE OR ALTER PROCEDURE GetDeviceById
+    @Id NVARCHAR(50)
+AS BEGIN
+    SET NOCOUNT ON;
+
+    SELECT * FROM Device d
+    WHERE d.Id = @Id;
+END

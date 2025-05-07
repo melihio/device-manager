@@ -41,7 +41,7 @@ public class Smartwatch: Device, IPowerNotifier
         switch (Battery)
         {
             case > 100:
-                throw new ArgumentOutOfRangeException(nameof(Battery), "Battery percentage more than 100%");
+                throw new ArgumentOutOfRangeException(nameof(Battery), "Battery percentage can't exceed 100%");
             case < 20:
                 throw new EmptyBatteryException();
         }

@@ -8,6 +8,7 @@ public class DeviceDTO
     public required string Type { get; set; }
     public required string Name { get; set; }
     public bool TurnedOn { get; set; }
+    public string Id { get; set; }
     public int? Battery { get; set; }
     public string? OperatingSystem { get; set; } 
     public string? NetworkName { get; set; } 
