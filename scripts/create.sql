@@ -1,7 +1,8 @@
 CREATE TABLE Device (
     Id NVARCHAR(50) PRIMARY KEY,
     Name NVARCHAR(100) NOT NULL,
-    IsEnabled BIT NOT NULL
+    IsEnabled BIT NOT NULL,
+    RowVersion ROWVERSION
 );
 
 CREATE TABLE Smartwatch (

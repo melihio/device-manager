@@ -44,63 +44,15 @@ public class DeviceManager
     /// <summary>
     ///  This method updates an already existing device in the database
     /// </summary>
-    public async void UpdateDevice(Device device)
+    public async Task UpdateDevice(Device device)
     {
-        List<Device> _devices = await GetAllDevices();
-        if (_devices.All(d => d.Id != device.Id))
-            throw new KeyNotFoundException($"No device found with given Id");
+        var existingDevice = await GetDeviceById(device.Id);
+        device.RowVersion = existingDevice.RowVersion;
 
-        await using var conn = new SqlConnection(_connectionString);
-        try
-        {
-            conn.Open();
-
-            const string deviceSql = "UPDATE Device SET Name = @Name, IsEnabled = @IsEnabled WHERE Id = @Id";
-            var deviceCommand = new SqlCommand(deviceSql, conn);
-            deviceCommand.Parameters.AddWithValue("@Id", device.Id);
-            deviceCommand.Parameters.AddWithValue("@Name", device.Name);
-            deviceCommand.Parameters.AddWithValue("@IsEnabled", device.TurnedOn);
-            deviceCommand.ExecuteNonQuery();
-
-            switch (device)
-            {
-                case Smartwatch sw:
-                    const string smartwatchSql = "UPDATE Smartwatch SET BatteryPercentage = @BatteryPercentage WHERE DeviceId = @DeviceId";
-                    var smartwatchCommand = new SqlCommand(smartwatchSql, conn);
-                    smartwatchCommand.Parameters.AddWithValue("@BatteryPercentage", sw.Battery);
-                    smartwatchCommand.Parameters.AddWithValue("@DeviceId", device.Id);
-                    if (smartwatchCommand.ExecuteNonQuery() == 0)
-                        throw new InvalidOperationException($"No Smartwatch found with DeviceId '{device.Id}' in the database.");
-                    break;
-
-                case PersonalComputer pc:
-                    const string pcSql = "UPDATE PersonalComputer SET OperationSystem = @OperationSystem WHERE DeviceId = @DeviceId";
-                    var pcCommand = new SqlCommand(pcSql, conn);
-                    pcCommand.Parameters.AddWithValue("@OperationSystem", pc.OperatingSystem ?? (object)DBNull.Value);
-                    pcCommand.Parameters.AddWithValue("@DeviceId", device.Id);
-                    if (pcCommand.ExecuteNonQuery() == 0)
-                        throw new InvalidOperationException($"No PersonalComputer found with DeviceId '{device.Id}' in the database.");
-                    break;
-
-                case EmbeddedDevice ed:
-                    const string embeddedSql = "UPDATE Embedded SET IpAddress = @IpAddress, NetworkName = @NetworkName WHERE DeviceId = @DeviceId";
-                    var embeddedCommand = new SqlCommand(embeddedSql, conn);
-                    embeddedCommand.Parameters.AddWithValue("@IpAddress", ed.IpAddress);
-                    embeddedCommand.Parameters.AddWithValue("@NetworkName", ed.NetworkName);
-                    embeddedCommand.Parameters.AddWithValue("@DeviceId", device.Id);
-                    if (embeddedCommand.ExecuteNonQuery() == 0)
-                        throw new InvalidOperationException($"No Embedded device found with DeviceId '{device.Id}' in the database.");
-                    break;
-
-                default:
-                    throw new ArgumentException("Unknown device type");
-            }
-        }
-        catch (SqlException ex)
-        {
-            throw new InvalidOperationException($"Failed to update device: {ex.Message}");
-        }
+        var rp = new DeviceRepository(_connectionString);
+        await rp.UpdateAsync(device);
     }
+
 
     /// <summary>
     ///  This method deletes an existing device from database.

@@ -30,5 +30,3 @@ BEGIN
             VALUES (@OperationSystem, @Id);
         END
 END
-
-SELECT * FROM DEVICE

@@ -56,9 +56,7 @@ public class DeviceRepository : IDeviceRepository
     public async Task<Device?> GetByIdAsync(string id)
     {
         if (string.IsNullOrEmpty(id))
-        {
-            throw new ArgumentException("Device ID cannot be null or empty.", nameof(id));
-        }
+            throw new ArgumentException("Device ID cannot be null or empty.");
 
         await using var conn = new SqlConnection(_connectionString);
         await using var command = new SqlCommand("GetDeviceById", conn);
@@ -74,8 +72,8 @@ public class DeviceRepository : IDeviceRepository
             Device device = deviceType switch
             {
                 "ED" => new EmbeddedDevice(
-                    reader.IsDBNull(5) ? throw new InvalidOperationException($"IpAddress is null for EmbeddedDevice with ID: {id}") : reader.GetString(5),
-                    reader.IsDBNull(6) ? throw new InvalidOperationException($"NetworkName is null for EmbeddedDevice with ID: {id}") : reader.GetString(6),
+                    reader.GetString(5),
+                    reader.GetString(6),
                     reader.GetString(0),
                     reader.GetString(1)
                 ),
@@ -86,13 +84,14 @@ public class DeviceRepository : IDeviceRepository
                     reader.GetString(1)
                 ),
                 "SW" => new Smartwatch(
-                    reader.IsDBNull(4) ? throw new InvalidOperationException($"BatteryPercentage is null for Smartwatch with ID: {id}") : reader.GetInt32(4),
+                    reader.GetInt32(4),
                     reader.GetBoolean(2),
                     reader.GetString(0),
                     reader.GetString(1)
                 ),
                 _ => throw new NotSupportedException($"Unknown device type: {deviceType} for ID: {id}")
             };
+            device.RowVersion = (byte[])reader["RowVersion"];
             return device;
         }
 
@@ -110,9 +109,11 @@ public class DeviceRepository : IDeviceRepository
         command.Parameters.AddWithValue("@Name", device.Name);
         command.Parameters.AddWithValue("@IsEnabled", device.TurnedOn);
         command.Parameters.AddWithValue("@BatteryPercentage", DBNull.Value);
+        command.Parameters.AddWithValue("@Type", GetTypeById(device.Id));
         command.Parameters.AddWithValue("@OperationSystem", DBNull.Value);
         command.Parameters.AddWithValue("@IpAddress", DBNull.Value);
         command.Parameters.AddWithValue("@NetworkName", DBNull.Value);
+        command.Parameters.Add("@OriginalRowVersion", SqlDbType.Timestamp).Value = device.RowVersion;
         
         switch (device)
         {
@@ -161,7 +162,7 @@ public class DeviceRepository : IDeviceRepository
             {
                 "ED" => new EmbeddedDevice(
                     reader.GetString(5),
-                     reader.GetString(6),
+                    reader.GetString(6),
                     reader.GetString(0),
                     reader.GetString(1)
                 ),
@@ -172,15 +173,19 @@ public class DeviceRepository : IDeviceRepository
                     reader.GetString(1)
                 ),
                 "SW" => new Smartwatch(
-                    reader.IsDBNull(4) ? throw new InvalidOperationException("BatteryPercentage is null") : reader.GetInt32(4),
+                    reader.GetInt32(4),
                     reader.GetBoolean(2),
                     reader.GetString(0),
                     reader.GetString(1)
                 ),
                 _ => throw new NotSupportedException($"Unknown device type: {deviceType}")
             };
+            
+            device.RowVersion = (byte[])reader["RowVersion"];
             list.Add(device);
         }
+
         return list;
     }
+
 }
