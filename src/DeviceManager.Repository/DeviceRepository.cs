@@ -21,36 +21,48 @@ public class DeviceRepository : IDeviceRepository
     public async Task AddAsync(Device device)
     {
         await using var conn = new SqlConnection(_connectionString);
-        await using var command = new SqlCommand("AddDevice", conn);
         await conn.OpenAsync();
-        
-        command.CommandType = CommandType.StoredProcedure;
-        command.Parameters.AddWithValue("@Id", device.Id);
-        command.Parameters.AddWithValue("@Name", device.Name);
-        command.Parameters.AddWithValue("@IsEnabled", device.TurnedOn);
-        command.Parameters.AddWithValue("@Type", GetTypeById(device.Id));
+        await using var transaction = await conn.BeginTransactionAsync();
 
-        command.Parameters.AddWithValue("@BatteryPercentage", DBNull.Value);
-        command.Parameters.AddWithValue("@OperationSystem", DBNull.Value);
-        command.Parameters.AddWithValue("@IpAddress", DBNull.Value);
-        command.Parameters.AddWithValue("@NetworkName", DBNull.Value);
-
-        switch (device)
+        try
         {
-            case Smartwatch sw:
-                command.Parameters["@BatteryPercentage"].Value = sw.Battery;
-                break;
-            case PersonalComputer pc:
-                command.Parameters["@OperationSystem"].Value = pc.OperatingSystem;
-                break;
-            case EmbeddedDevice ed:
-                command.Parameters["@IpAddress"].Value = ed.IpAddress;
-                command.Parameters["@NetworkName"].Value = ed.NetworkName;
-                break;
-            default:
-                throw new NotSupportedException($"Unknown device type");
+            await using var command = new SqlCommand("AddDevice", conn, (SqlTransaction)transaction);
+            command.CommandType = CommandType.StoredProcedure;
+
+            command.Parameters.AddWithValue("@Id", device.Id);
+            command.Parameters.AddWithValue("@Name", device.Name);
+            command.Parameters.AddWithValue("@IsEnabled", device.TurnedOn);
+            command.Parameters.AddWithValue("@Type", GetTypeById(device.Id));
+
+            command.Parameters.AddWithValue("@BatteryPercentage", DBNull.Value);
+            command.Parameters.AddWithValue("@OperationSystem", DBNull.Value);
+            command.Parameters.AddWithValue("@IpAddress", DBNull.Value);
+            command.Parameters.AddWithValue("@NetworkName", DBNull.Value);
+
+            switch (device)
+            {
+                case Smartwatch sw:
+                    command.Parameters["@BatteryPercentage"].Value = sw.Battery;
+                    break;
+                case PersonalComputer pc:
+                    command.Parameters["@OperationSystem"].Value = pc.OperatingSystem;
+                    break;
+                case EmbeddedDevice ed:
+                    command.Parameters["@IpAddress"].Value = ed.IpAddress;
+                    command.Parameters["@NetworkName"].Value = ed.NetworkName;
+                    break;
+                default:
+                    throw new NotSupportedException($"Unknown device type");
+            }
+
+            await command.ExecuteNonQueryAsync();
+            await transaction.CommitAsync();
         }
-        await command.ExecuteNonQueryAsync();
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<Device?> GetByIdAsync(string id)
@@ -97,53 +109,76 @@ public class DeviceRepository : IDeviceRepository
 
         return null;
     }
-    
+
     public async Task UpdateAsync(Device device)
     {
         await using var conn = new SqlConnection(_connectionString);
-        await using var command = new SqlCommand("UpdateDevice", conn);
         await conn.OpenAsync();
+        await using var transaction = await conn.BeginTransactionAsync();
 
-        command.CommandType = CommandType.StoredProcedure;
-        command.Parameters.AddWithValue("@Id", device.Id);
-        command.Parameters.AddWithValue("@Name", device.Name);
-        command.Parameters.AddWithValue("@IsEnabled", device.TurnedOn);
-        command.Parameters.AddWithValue("@BatteryPercentage", DBNull.Value);
-        command.Parameters.AddWithValue("@Type", GetTypeById(device.Id));
-        command.Parameters.AddWithValue("@OperationSystem", DBNull.Value);
-        command.Parameters.AddWithValue("@IpAddress", DBNull.Value);
-        command.Parameters.AddWithValue("@NetworkName", DBNull.Value);
-        command.Parameters.Add("@OriginalRowVersion", SqlDbType.Timestamp).Value = device.RowVersion;
-        
-        switch (device)
+        try
         {
-            case Smartwatch sw:
-                command.Parameters["@BatteryPercentage"].Value = sw.Battery;
-                break;
-            case PersonalComputer pc:
-                command.Parameters["@OperationSystem"].Value = pc.OperatingSystem;
-                break;
-            case EmbeddedDevice ed:
-                command.Parameters["@IpAddress"].Value = ed.IpAddress;
-                command.Parameters["@NetworkName"].Value = ed.NetworkName;
-                break;
+            await using var command = new SqlCommand("UpdateDevice", conn, (SqlTransaction)transaction);
+            command.CommandType = CommandType.StoredProcedure;
+
+            command.Parameters.AddWithValue("@Id", device.Id);
+            command.Parameters.AddWithValue("@Name", device.Name);
+            command.Parameters.AddWithValue("@IsEnabled", device.TurnedOn);
+            command.Parameters.AddWithValue("@Type", GetTypeById(device.Id));
+            command.Parameters.AddWithValue("@BatteryPercentage", DBNull.Value);
+            command.Parameters.AddWithValue("@OperationSystem", DBNull.Value);
+            command.Parameters.AddWithValue("@IpAddress", DBNull.Value);
+            command.Parameters.AddWithValue("@NetworkName", DBNull.Value);
+            command.Parameters.Add("@OriginalRowVersion", SqlDbType.Timestamp).Value = device.RowVersion;
+
+            switch (device)
+            {
+                case Smartwatch sw:
+                    command.Parameters["@BatteryPercentage"].Value = sw.Battery;
+                    break;
+                case PersonalComputer pc:
+                    command.Parameters["@OperationSystem"].Value = pc.OperatingSystem;
+                    break;
+                case EmbeddedDevice ed:
+                    command.Parameters["@IpAddress"].Value = ed.IpAddress;
+                    command.Parameters["@NetworkName"].Value = ed.NetworkName;
+                    break;
+            }
+
+            await command.ExecuteNonQueryAsync();
+            await transaction.CommitAsync();
         }
-        await command.ExecuteNonQueryAsync();
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<int> DeleteAsync(string id, string type)
     {
         await using var conn = new SqlConnection(_connectionString);
-        await using var command = new SqlCommand("DeleteDevice", conn);
         await conn.OpenAsync();
-        
-        command.CommandType = CommandType.StoredProcedure;
-        command.Parameters.AddWithValue("@Id", id);
-        command.Parameters.AddWithValue("@Type", type);
-        
-        return await command.ExecuteNonQueryAsync();
+        await using var transaction = await conn.BeginTransactionAsync();
+
+        try
+        {
+            await using var command = new SqlCommand("DeleteDevice", conn, (SqlTransaction)transaction);
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@Id", id);
+            command.Parameters.AddWithValue("@Type", type);
+
+            var result = await command.ExecuteNonQueryAsync();
+            await transaction.CommitAsync();
+            return result;
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
-    
+
     public async Task<List<Device>> GetAllAsync()
     {
         await using var conn = new SqlConnection(_connectionString);
@@ -180,12 +215,10 @@ public class DeviceRepository : IDeviceRepository
                 ),
                 _ => throw new NotSupportedException($"Unknown device type: {deviceType}")
             };
-            
             device.RowVersion = (byte[])reader["RowVersion"];
             list.Add(device);
         }
 
         return list;
     }
-
 }
